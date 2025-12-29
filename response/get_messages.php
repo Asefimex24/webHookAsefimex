@@ -1,0 +1,21 @@
+<?php
+// get_messages.php
+$dsn = "mysql:host=localhost;dbname=webhookasefimex;charset=utf8";
+$pdo = new PDO($dsn, "root", "");
+$mensajes = $pdo->query("SELECT * FROM mensajes_whatsapp ORDER BY fecha_recibido DESC LIMIT 20")->fetchAll();
+
+foreach ($mensajes as $m): ?>
+    <tr>
+        <td><strong><?php echo str_replace('whatsapp:', '', $m['remitente']); ?></strong></td>
+        <td><?php echo htmlspecialchars($m['mensaje']); ?></td>
+        <td class="text-muted small"><?php echo $m['fecha_recibido']; ?></td>
+        <td>
+            <button class="btn btn-sm btn-outline-success" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#replyModal" 
+                    data-num="<?php echo $m['remitente']; ?>">
+                Responder
+            </button>
+        </td>
+    </tr>
+<?php endforeach; ?>
