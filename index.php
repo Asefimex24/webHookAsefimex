@@ -1,7 +1,11 @@
 <?php
-$dsn = "mysql:host=localhost;dbname=webhookasefimex;charset=utf8";
-$pdo = new PDO($dsn, "root", "");
+    require_once('getEnv.php');
+
+$dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8";
+$pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
 $mensajes = $pdo->query("SELECT * FROM mensajes_whatsapp ORDER BY fecha_recibido DESC")->fetchAll();
+
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
