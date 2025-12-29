@@ -1,7 +1,8 @@
 <?php
     require_once('getEnv.php');
-    $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8";
+    $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
     $pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
+    
     $mensajes = $pdo->query("SELECT * FROM mensajes_whatsapp ORDER BY fecha_recibido DESC")->fetchAll();
 
 ?>

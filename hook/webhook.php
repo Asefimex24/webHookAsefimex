@@ -1,4 +1,9 @@
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once('getEnv.php');
 
 // Recibir datos de Twilio
@@ -7,7 +12,8 @@ $body = $_POST['Body'] ?? '';
 $sid = $_POST['MessageSid'] ?? '';
 
 if (!empty($from) && !empty($body)) {
-    $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8";
+
+    $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
     $pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
 
     $sql = "INSERT INTO mensajes_whatsapp (whatsapp_sid, remitente, mensaje) VALUES (?, ?, ?)";
