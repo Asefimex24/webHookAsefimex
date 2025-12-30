@@ -3,7 +3,14 @@
     $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
     $pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
 
-    $mensajes = $pdo->query("SELECT * FROM mensajes_whatsapp ORDER BY fecha_recibido DESC")->fetchAll();
+    $mensajes = $pdo->query("SELECT remitente, mensaje, fecha_recibido
+FROM mensajes_whatsapp
+WHERE id IN (
+    SELECT MAX(id)
+    FROM mensajes_whatsapp
+    GROUP BY remitente
+)
+ORDER BY fecha_recibido DESC;")->fetchAll();
 
 ?>
 <!DOCTYPE html>
@@ -27,7 +34,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th>Remitente</th>
-                        <th>Mensaje</th>
+                        <th>Último Mensaje</th>
                         <th>Fecha</th>
                         <th>Acciones</th>
                     </tr>
