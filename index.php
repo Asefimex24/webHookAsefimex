@@ -1,10 +1,10 @@
 <?php
-    date_default_timezone_set("America/Mexico_City");
-    require_once('getEnv.php');
-    $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
-    $pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
+date_default_timezone_set("America/Mexico_City");
+require_once('getEnv.php');
+$dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
+$pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
 
-    $mensajes = $pdo->query("SELECT remitente, mensaje, fecha_recibido
+$mensajes = $pdo->query("SELECT remitente, mensaje, fecha_recibido
 FROM mensajes_whatsapp
 WHERE id IN (
     SELECT MAX(id)
@@ -47,9 +47,7 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
                             <td><?php echo htmlspecialchars($m['mensaje']); ?></td>
                             <td class="text-muted"><?php echo $m['fecha_recibido']; ?></td>
                             <td>
-                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal"
-                                    data-bs-target="#replyModal"
-                                    data-num="<?php echo $m['remitente']; ?>">
+                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#replyModal" data-num="<?php echo $m['remitente']; ?>">
                                     Ver / Responder
                                 </button>
                             </td>
@@ -61,11 +59,15 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
                 <div class="modal-dialog">
                     <form action="enviar_respuesta.php" method="POST" class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Responder a <span id="displayNum"></span></h5>
+                            <h5 class="modal-title">Historial de mensajes con: <span id="displayNum"></span></h5>
                         </div>
                         <div class="modal-body">
+                            <div id="chat-history" class="mb-3 p-3 border rounded bg-white"
+                                style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column;">
+                            </div>
+
                             <input type="hidden" name="to" id="inputNum">
-                            <textarea name="message" class="form-control" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                            <textarea name="message" class="form-control" placeholder="Escribe tu respuesta..." required></textarea>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">Enviar WhatsApp</button>
@@ -76,36 +78,8 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
         </div>
     </div>
 </body>
-<script>
-// Script para pasar el número al modal
-const replyModal = document.getElementById('replyModal');
-replyModal.addEventListener('show.bs.modal', event => {
-  const button = event.relatedTarget;
-  const num = button.getAttribute('data-num');
-  document.getElementById('displayNum').textContent = num;
-  document.getElementById('inputNum').value = num;
-});
-</script>
-<script>
-    function cargarMensajes() {
-        fetch('response/get_messages.php')
-            .then(response => response.text())
-            .then(html => {
-                const tabla = document.getElementById('tabla-mensajes');
-                // Solo actualizamos si el contenido ha cambiado para evitar parpadeos
-                if (tabla.innerHTML !== html) {
-                    tabla.innerHTML = html;
-                }
-            })
-            .catch(error => console.error('Error cargando mensajes:', error));
-    }
-
-    // Ejecutar cada segundos
-    setInterval(cargarMensajes, 1000);
-
-    // Cargar al abrir la página por primera vez
-    document.addEventListener('DOMContentLoaded', cargarMensajes);
-</script>
 
 </html>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/getMessages.js"></script>
+<script src="js/modal.js"></script>
