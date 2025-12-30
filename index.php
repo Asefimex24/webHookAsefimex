@@ -2,7 +2,7 @@
     require_once('getEnv.php');
     $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
     $pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
-    
+
     $mensajes = $pdo->query("SELECT * FROM mensajes_whatsapp ORDER BY fecha_recibido DESC")->fetchAll();
 
 ?>
@@ -32,15 +32,14 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tabla-mensajes">
                     <?php foreach ($mensajes as $m): ?>
                         <tr>
                             <td><strong><?php echo str_replace('whatsapp:', '', $m['remitente']); ?></strong></td>
                             <td><?php echo htmlspecialchars($m['mensaje']); ?></td>
                             <td class="text-muted"><?php echo $m['fecha_recibido']; ?></td>
                             <td>
-                                <button class="btn btn-sm btn-outline-success"
-                                    data-bs-toggle="modal"
+                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal"
                                     data-bs-target="#replyModal"
                                     data-num="<?php echo $m['remitente']; ?>">
                                     Responder
@@ -69,9 +68,6 @@
         </div>
     </div>
 </body>
-
-</html>
-
 <script>
 // Script para pasar el número al modal
 const replyModal = document.getElementById('replyModal');
@@ -82,3 +78,26 @@ replyModal.addEventListener('show.bs.modal', event => {
   document.getElementById('inputNum').value = num;
 });
 </script>
+<script>
+    function cargarMensajes() {
+        fetch('response/get_messages.php')
+            .then(response => response.text())
+            .then(html => {
+                const tabla = document.getElementById('tabla-mensajes');
+                // Solo actualizamos si el contenido ha cambiado para evitar parpadeos
+                if (tabla.innerHTML !== html) {
+                    tabla.innerHTML = html;
+                }
+            })
+            .catch(error => console.error('Error cargando mensajes:', error));
+    }
+
+    // Ejecutar cada 3 segundos
+    setInterval(cargarMensajes, 3000);
+
+    // Cargar al abrir la página por primera vez
+    document.addEventListener('DOMContentLoaded', cargarMensajes);
+</script>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
