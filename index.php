@@ -70,7 +70,7 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
                             <textarea name="message" class="form-control" placeholder="Escribe tu respuesta..." required></textarea>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Enviar WhatsApp</button>
+                            <button type="submit" class="btn btn-primary">Responder</button>
                         </div>
                     </form>
                 </div>

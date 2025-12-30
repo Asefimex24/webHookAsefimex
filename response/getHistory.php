@@ -14,9 +14,12 @@ if ($remitente) {
     $historial = $stmt->fetchAll();
 
     foreach ($historial as $h) {
-        echo "<div class='mb-2 p-2 bg-light rounded shadow-sm'>";
-        echo "<small class='text-muted d-block' style='font-size: 0.7rem;'>{$h['fecha_recibido']}</small>";
-        echo "<span>" . htmlspecialchars($h['mensaje']) . "</span>";
-        echo "</div>";
+        echo "<div class='mb-2 p-2 rounded shadow-sm' style='background-color: #e2f7cb; border-left: 4px solid #25d366;'>";
+echo "  <div class='d-flex justify-content-between'>";
+echo "    <small class='text-muted' style='font-size: 0.7rem;'>$remitente</small>";
+echo "    <small class='text-muted' style='font-size: 0.7rem;'>" . date('H:i', strtotime($h['fecha_recibido'])) . "</small>";
+echo "  </div>";
+echo "  <div class='mt-1'>" . htmlspecialchars($h['mensaje']) . "</div>";
+echo "</div>";
     }
 }
