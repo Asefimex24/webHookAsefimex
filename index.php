@@ -1,4 +1,5 @@
 <?php
+    date_default_timezone_set("America/Mexico_City");
     require_once('getEnv.php');
     $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
     $pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
