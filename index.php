@@ -41,40 +41,28 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
                     </tr>
                 </thead>
                 <tbody id="tabla-mensajes">
-                    <?php foreach ($mensajes as $m): ?>
-                        <tr>
-                            <td><strong><?php echo $m['remitente']; ?></strong></td>
-                            <td><?php echo htmlspecialchars($m['mensaje']); ?></td>
-                            <td class="text-muted"><?php echo $m['fecha_recibido']; ?></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#replyModal" data-num="<?php echo $m['remitente']; ?>">
-                                    Ver / Responder
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
+                    <!-- tabla para cargar los mensajes dinámicamente -->
                 </tbody>
             </table>
-            <div class="modal fade" id="replyModal" tabindex="-1">
-                <div class="modal-dialog">
-                    <form action="enviar_respuesta.php" method="POST" class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Historial de mensajes con: <span id="displayNum"></span></h5>
-                        </div>
-                        <div class="modal-body">
-                            <div id="chat-history" class="mb-3 p-3 border rounded bg-white"
-                                style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column;">
-                            </div>
 
-                            <input type="hidden" name="to" id="inputNum">
-                            <textarea name="message" class="form-control" placeholder="Escribe tu respuesta..." required></textarea>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Responder</button>
-                        </div>
-                    </form>
+        </div>
+    </div>
+    <div class="modal fade" id="replyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="enviar_respuesta.php" method="POST" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Historial de mensajes con: <span id="displayNum"></span></h5>
                 </div>
-            </div>
+                <div class="modal-body">
+                    <div id="chat-history" class="mb-3 p-3 border rounded bg-white" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column;">
+                    </div>
+                    <input type="hidden" name="to" id="inputNum">
+                    <textarea name="message" class="form-control" placeholder="Escribe tu respuesta..." required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Responder</button>
+                </div>
+            </form>
         </div>
     </div>
 </body>
