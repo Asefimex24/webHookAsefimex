@@ -9,7 +9,7 @@ $mensajes = $pdo->query("SELECT * FROM mensajes_whatsapp ORDER BY fecha_recibido
 
 foreach ($mensajes as $m): ?>
     <tr>
-        <td><strong><?php echo str_replace('whatsapp:', '', $m['remitente']); ?></strong></td>
+        <td><strong><?php echo substr($m['remitente'],9); ?></strong></td>
         <td><?php echo htmlspecialchars($m['mensaje']); ?></td>
         <td class="text-muted small"><?php echo $m['fecha_recibido']; ?></td>
         <td>
@@ -19,4 +19,6 @@ foreach ($mensajes as $m): ?>
             </button>
         </td>
     </tr>
-<?php endforeach; ?>
+<?php 
+endforeach;
+ ?>

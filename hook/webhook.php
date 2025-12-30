@@ -9,7 +9,12 @@ require "../getEnv.php";
 // Recibir datos de Twilio
 $from = $_POST['From'] ?? '';
 $body = $_POST['Body'] ?? '';
-$sid = $_POST['MessageSid'] ?? '';
+$sid = $_POST['MessageSid'] ?? ''; 
+
+if($from!=""){
+
+    $from = substr($from,9);
+}
 
 if (!empty($from) && !empty($body)) {
 
