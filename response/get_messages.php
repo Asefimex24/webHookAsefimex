@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set("America/Mexico_City");
 require_once '../getEnv.php';
 
 $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
@@ -22,7 +22,7 @@ foreach ($mensajes as $m): ?>
         <td>
             <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#replyModal" 
                     data-num="<?php echo $m['remitente']; ?>">
-                Responder
+                Ver / Responder
             </button>
         </td>
     </tr>

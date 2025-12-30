@@ -50,7 +50,7 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
                                 <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal"
                                     data-bs-target="#replyModal"
                                     data-num="<?php echo $m['remitente']; ?>">
-                                    Responder
+                                    Ver / Responder
                                 </button>
                             </td>
                         </tr>
@@ -100,8 +100,8 @@ replyModal.addEventListener('show.bs.modal', event => {
             .catch(error => console.error('Error cargando mensajes:', error));
     }
 
-    // Ejecutar cada 3 segundos
-    setInterval(cargarMensajes, 3000);
+    // Ejecutar cada segundos
+    setInterval(cargarMensajes, 1000);
 
     // Cargar al abrir la página por primera vez
     document.addEventListener('DOMContentLoaded', cargarMensajes);
