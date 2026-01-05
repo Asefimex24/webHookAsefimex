@@ -27,7 +27,7 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Mensajes de WhatsApp</h2>
-            <button class="btn btn-primary" onclick="location.reload()">Actualizar</button>
+            <!-- <button class="btn btn-primary" onclick="location.reload()">Actualizar</button> -->
         </div>
 
         <div class="table-responsive bg-white shadow-sm p-3 rounded">
@@ -47,15 +47,18 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
 
         </div>
     </div>
+
+    <!-- //modal para responder mensajes -->
     <div class="modal fade" id="replyModal" tabindex="-1">
         <div class="modal-dialog">
-            <form action="enviar_respuesta.php" method="POST" class="modal-content">
+            <form action="response/sendRespuesta.php" method="POST" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Historial de mensajes con: <span id="displayNum"></span></h5>
                 </div>
                 <div class="modal-body">
-                    <div id="chat-history" class="mb-3 p-3 border rounded bg-white" style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column;">
-                    </div>
+                    <div id="chat-history" class="mb-3 p-3 border rounded d-flex flex-column" 
+     style="height: 350px; overflow-y: auto; background-color: #f0f2f5;">
+    </div>
                     <input type="hidden" name="to" id="inputNum">
                     <textarea name="message" class="form-control" placeholder="Escribe tu respuesta..." required></textarea>
                 </div>
@@ -65,6 +68,8 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
             </form>
         </div>
     </div>
+
+
 </body>
 
 </html>
