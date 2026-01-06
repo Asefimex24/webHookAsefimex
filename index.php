@@ -34,10 +34,10 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
             <table class="table table-hover">
                 <thead class="table-dark">
                     <tr>
-                        <th>Remitente</th>
+                        <th>Contacto</th>
                         <th>Último Mensaje</th>
                         <th>Fecha</th>
-                        <th>Acciones</th>
+                        <!-- <th>Acciones</th> -->
                     </tr>
                 </thead>
                 <tbody id="tabla-mensajes">

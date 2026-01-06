@@ -1,4 +1,8 @@
 <?php
+//script para realizar envio de notificaciones de recordatorios de pago a los clientes
+//mediante whatsapp usando plantillas de twilio
+//ejecutar este script cada 10 minutos mediante cron job
+
 date_default_timezone_set("America/Mexico_City");
 require_once('../getEnv.php');
 require_once '../vendor/twilio/sdk/src/Twilio/autoload.php';
@@ -8,6 +12,7 @@ use Twilio\Rest\Client;
 $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
 $pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
 $pdo->exec("SET time_zone = '-06:00'");
+
 // 1. Verificar límite diario (opcional pero recomendado)
 $hoy = date('Y-m-d');
 
@@ -18,7 +23,7 @@ if ($enviadosHoy >= 250) {
 }
 
 // 2. Tomar los siguientes 100 mensajes pendientes
-$stmt = $pdo->query("SELECT * FROM cola_mensajes WHERE estado = 'pendiente' ORDER BY id ASC LIMIT 250");
+$stmt = $pdo->query("SELECT * FROM cola_mensajes WHERE estado = 'pendiente' ORDER BY id ASC LIMIT 20");
 $lote = $stmt->fetchAll();
 
 if ($lote) {
@@ -27,8 +32,6 @@ if ($lote) {
     $sid = $_ENV['TWILIO_ACCOUNT_SID'];
     $token = $_ENV['TWILIO_AUTH_TOKEN'];
     $twilio = new Client($sid, $token);
-
-    $contador = 0;
 
     foreach ($lote as $tarea) {
 
@@ -56,16 +59,18 @@ if ($lote) {
                 $update = $pdo->prepare("UPDATE cola_mensajes SET estado = 'enviado', enviado_en = NOW() WHERE id = ?");
                 $update->execute([$tarea['id']]);
 
-                //guardar en tabla de mensajes_whatsapp para poder ver el historial de mensajes que responden los clientes.
+                //estructura del mensaje para guardar en la tabla de mensajes_whatsapp
                 $messageBody = 'Estimado(a) ' . $tarea['nombreCliente'] . ', Asefimex le informa que el pago de su crédito #' . $tarea['idCredito'] . ' vence el próximo ' . $tarea['proxPago'] . '.
                                 Le sugerimos realizar su pago puntualmente para mantener sus beneficios. Una vez realizado, 
                                 por favor envíe su comprobante a su ejecutivo asignado. ¡Gracias!';
 
+                //guardar en tabla de mensajes_whatsapp para poder ver el historial de mensajes que responden los clientes.
                 $sql = "INSERT INTO mensajes_whatsapp (remitente, mensaje, direccion) VALUES (?, ?, 'saliente')";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute(['+521' . $tarea['telefono'], $messageBody]);
                 
             } catch (Exception $e) {
+                // En caso de error, marcar como fallido
                 $update = $pdo->prepare("UPDATE cola_mensajes SET estado = 'fallido' WHERE id = ?");
                 $update->execute([$tarea['id']]);
             }
@@ -75,11 +80,7 @@ if ($lote) {
             $update->execute([$tarea['id']]);
             continue;
         }
-        //aumentar el contador
-        $contador++;
-        if ($contador % 20 == 0) {
-            sleep(1); // Pausa tras cada 20 elementos
-        }
+            sleep(1); // Pausa tras cada mensaje
     }
 
     echo "Lote de " . count($lote) . " mensajes procesado.";
