@@ -44,7 +44,7 @@ if ($lote) {
                     "whatsapp:+521" . $tarea['celular'], // Destinatario
                     [
                         "from" => "whatsapp:+5219612049936", // Tu número de Twilio
-                        "contentSid" => "HX4b916566eaa85711ad322dfe9c6dd577", // Tu SID de plantilla
+                        "contentSid" => "HX8c0833fef880016ad2637f2169a13959", // Tu SID de plantilla
                     ]
                 );
 

@@ -17,7 +17,7 @@ ORDER BY fecha_recibido DESC;")->fetchAll();
 foreach ($mensajes as $m): 
 
     if(mb_strlen($m['mensaje'], "UTF-8") > 30){
-        $muestraMensaje = mb_substr($m['mensaje'], 0, 70, "UTF-8") . '...';
+        $muestraMensaje = mb_substr($m['mensaje'], 0, 70, "UTF-8") . ' ...';
     } else {
         $muestraMensaje = $m['mensaje'];
     }
