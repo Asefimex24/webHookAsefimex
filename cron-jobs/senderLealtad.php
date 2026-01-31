@@ -29,8 +29,8 @@ $lote = $stmt->fetchAll();
 if ($lote) {
 
     //cargar los datos de cuenta twilio      
-    $sid = $_ENV['TWILIO_ACCOUNT_SID'];
-    $token = $_ENV['TWILIO_AUTH_TOKEN'];
+    $sid = '';
+    $token = '';
     $twilio = new Client($sid, $token);
 
     foreach ($lote as $tarea) {
