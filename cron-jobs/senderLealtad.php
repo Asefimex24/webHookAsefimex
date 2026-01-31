@@ -5,7 +5,7 @@ echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
 
 date_default_timezone_set("America/Mexico_City");
 
-require_once 'twilio/sdk/src/Twilio/autoload.php';
+require_once __DIR__ . '/twilio/sdk/src/Twilio/autoload.php';
 
 use Twilio\Rest\Client;
 
