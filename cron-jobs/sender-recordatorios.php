@@ -8,8 +8,8 @@ require_once 'twilio/sdk/src/Twilio/autoload.php';
 
 use Twilio\Rest\Client;
 
-$dsn = "mysql:host=localhost;dbname=u547829635_wbhMensajeriaW;charset=utf8mb4";
-$pdo = new PDO($dsn, 'u547829635_asefimex_msj', '@S3f1m3x2025Hook');
+$dsn = "mysql:host=localhost;dbname=myDb;charset=utf8mb4";
+$pdo = new PDO($dsn, 'usr', 'psd');
 $pdo->exec("SET time_zone = '-06:00'");
 
 // 1. Verificar límite diario (opcional pero recomendado)
@@ -28,8 +28,8 @@ $lote = $stmt->fetchAll();
 if ($lote) {
 
     //cargar los datos de cuenta twilio
-    $sid = $_ENV['AC85d0cf9fe68f8fd08c96341d4553ea51'];
-    $token = $_ENV['cbaa3d4fe2d48ea341bee2fceb78fbc2'];
+    $sid = $_ENV['TWILIO_ACCOUNT_SID'];
+    $token = $_ENV['TWILIO_AUTH_TOKEN'];
     $twilio = new Client($sid, $token);
 
     foreach ($lote as $tarea) {
