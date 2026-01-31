@@ -12,7 +12,7 @@ WHERE id IN (
     FROM mensajes_whatsapp
     GROUP BY remitente
 )
-ORDER BY fecha_recibido DESC;")->fetchAll();
+ORDER BY fecha_recibido DESC LIMIT 30;")->fetchAll();
 
 foreach ($mensajes as $m): 
 
