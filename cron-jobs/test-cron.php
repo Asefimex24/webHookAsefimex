@@ -20,7 +20,8 @@ for ($contador = 1; $contador <= 400; $contador++) {
     $update = $pdo->prepare("INSERT INTO test_cron(comentario) values('prueba cron # $contador')");
     $update->execute();
     if ($contador % 10 == 0) {
-        // Pausa tras cada mensaje    
+        // Pausa tras cada mensaje  
+        echo 'Pausa de mensaje cronjob # '.$contador;  
         sleep(1);
     }
 }
