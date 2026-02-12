@@ -1,2 +1,3 @@
 #ignorar archivo de variables de entorno
 .env
+cron-jobs/config.php

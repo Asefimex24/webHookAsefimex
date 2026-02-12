@@ -2,14 +2,18 @@
 //script para realizar envio de notificaciones de recordatorios de pago a los clientes
 //mediante whatsapp usando plantillas de twilio
 //ejecutar este script cada 10 minutos mediante cron job
+set_time_limit(0);
+echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
 
 date_default_timezone_set("America/Mexico_City");
-require_once 'twilio/sdk/src/Twilio/autoload.php';
+
+require_once __DIR__ . '/twilio/sdk/src/Twilio/autoload.php';
 
 use Twilio\Rest\Client;
+include "config.php";
 
-$dsn = "mysql:host=localhost;dbname=myDb;charset=utf8mb4";
-$pdo = new PDO($dsn, 'usr', 'psd');
+$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
+$pdo = new PDO($dsn, $usr, $psd);
 $pdo->exec("SET time_zone = '-06:00'");
 
 // 1. Verificar límite diario (opcional pero recomendado)
@@ -17,20 +21,23 @@ $hoy = date('Y-m-d');
 
 $enviadosHoy = $pdo->query("SELECT COUNT(*) FROM cola_mensajes WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
-if ($enviadosHoy >= 250) {
-    die("Límite diario de 250 mensajes alcanzado.");
+if ($enviadosHoy >= 2000) {
+    die("Límite diario de 2,000 mensajes alcanzado.");
 }
 
-// 2. Tomar los siguientes 100 mensajes pendientes
-$stmt = $pdo->query("SELECT * FROM cola_mensajes WHERE estado = 'pendiente' ORDER BY id ASC LIMIT 20");
+// 2. Tomar los siguientes 400 mensajes pendientes
+$stmt = $pdo->query("SELECT * FROM cola_mensajes WHERE estado = 'pendiente' ORDER BY id ASC LIMIT 400");
 $lote = $stmt->fetchAll();
 
 if ($lote) {
 
     //cargar los datos de cuenta twilio
-    $sid = $_ENV['TWILIO_ACCOUNT_SID'];
-    $token = $_ENV['TWILIO_AUTH_TOKEN'];
+    $sid = $sidtw;
+    $token = $tokentw;
     $twilio = new Client($sid, $token);
+
+    //contador para validar el envio de 10 mensajes y poner delay de 1 seg.
+    $contador=1;
 
     foreach ($lote as $tarea) {
 
@@ -79,9 +86,15 @@ if ($lote) {
             $update->execute([$tarea['id']]);
             continue;
         }
-            sleep(1); // Pausa tras cada mensaje
-    }
 
+        $contador++;
+        
+        if($contador%10==0){        
+            // Pausa tras cada mensaje    
+            sleep(1); 
+        }
+        
+    }
     echo "Lote de " . count($lote) . " mensajes procesado.";
 } else {
     echo "No hay mensajes pendientes en la cola.";
