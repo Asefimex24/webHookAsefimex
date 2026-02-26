@@ -11,7 +11,7 @@ document.addEventListener('click', function (event) {
         const historyContainer = document.getElementById('chat-history');
         historyContainer.innerHTML = '<div class="text-center">Cargando historial...</div>';
 
-        fetch('response/getHistory.php?remitente=' + encodeURIComponent(num))
+        fetch('../response/getHistory.php?remitente=' + encodeURIComponent(num))
             .then(response => response.text())
             .then(html => {
                 historyContainer.innerHTML = html;

@@ -1,5 +1,6 @@
 function cargarMensajes() {
-    fetch('response/get_messages.php')
+    fetch('../response/get_messages.php')
+    
         .then(response => response.text())
         .then(html => {
             const tabla = document.getElementById('tabla-mensajes');
@@ -11,8 +12,8 @@ function cargarMensajes() {
         .catch(error => console.error('Error cargando mensajes:', error));
 }
 
-// Ejecutar cada segundos
-setInterval(cargarMensajes, 2000);
+// Ejecutar cada 3 segundos
+setInterval(cargarMensajes, 3000);
 
 // Cargar al abrir la página por primera vez
 document.addEventListener('DOMContentLoaded', cargarMensajes);

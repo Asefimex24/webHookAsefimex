@@ -1,78 +1,64 @@
-<?php
-date_default_timezone_set("America/Mexico_City");
-require_once('getEnv.php');
-$dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
-$pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
-
-$mensajes = $pdo->query("SELECT remitente, mensaje, fecha_recibido
-FROM mensajes_whatsapp
-WHERE id IN (
-    SELECT MAX(id)
-    FROM mensajes_whatsapp
-    GROUP BY remitente
-)
-ORDER BY fecha_recibido DESC;")->fetchAll();
-
-?>
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Panel WhatsApp</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acceso a Chat de Clientes</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="dist/plugins/fontawesome-free/css/all.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+
 </head>
+<body class="hold-transition lockscreen">
+<!-- Automatic element centering -->
+<div class="lockscreen-wrapper">
+  <div class="lockscreen-logo">
+    <a href=""><b>Asefimex</b></a>
+  </div>
+  <!-- User name -->
+  <div class="lockscreen-name">PIN de Acceso</div>
 
-<body class="bg-light">
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Mensajes de WhatsApp</h2>
-            <!-- <button class="btn btn-primary" onclick="location.reload()">Actualizar</button> -->
-        </div>
-
-        <div class="table-responsive bg-white shadow-sm p-3 rounded">
-            <table class="table table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Contacto</th>
-                        <th>Último Mensaje</th>
-                        <th>Fecha</th>
-                        <!-- <th>Acciones</th> -->
-                    </tr>
-                </thead>
-                <tbody id="tabla-mensajes">
-                    <!-- tabla para cargar los mensajes dinámicamente -->
-                </tbody>
-            </table>
-
-        </div>
+  <!-- START LOCK SCREEN ITEM -->
+  <div class="lockscreen-item">
+    <!-- lockscreen image -->
+    <div class="lockscreen-image">
+      <img src="dist/img/logo-1.png" alt="User Image">
     </div>
+    <!-- /.lockscreen-image -->
 
-    <!-- //modal para responder mensajes -->
-    <div class="modal fade" id="replyModal" tabindex="-1">
-        <div class="modal-dialog">
-            <form action="response/sendRespuesta.php" method="POST" class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Historial de mensajes con: <span id="displayNum"></span></h5>
-                </div>
-                <div class="modal-body">
-                    <div id="chat-history" class="mb-3 p-3 border rounded d-flex flex-column" 
-     style="height: 350px; overflow-y: auto; background-color: #f0f2f5;">
-    </div>
-                    <input type="hidden" name="to" id="inputNum">
-                    <textarea name="message" class="form-control" placeholder="Escribe tu respuesta..." required></textarea>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Responder</button>
-                </div>
-            </form>
+    <!-- lockscreen credentials (contains the form) -->
+    <form class="lockscreen-credentials">
+      <div class="input-group">
+        <input type="password" class="form-control" placeholder="password" required>
+
+        <div class="input-group-append">
+          <button type="submit" class="btn">
+            <i class="fas fa-arrow-right text-muted"></i>
+          </button>
         </div>
-    </div>
+      </div>
+    </form>
+    <!-- /.lockscreen credentials -->
 
+  </div>
+  <!-- /.lockscreen-item -->
+  <div class="help-block text-center">
+    Ingrese su PIN para 
+  </div>
+  <div class="text-center">
+    Acceder al Chat de Clientes
+  </div>
 
+</div>
+<!-- /.center -->
+
+<!-- jQuery -->
+<script src="dist/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="dist/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/getMessages.js"></script>
-<script src="js/modal.js"></script>

@@ -21,12 +21,12 @@ $hoy = date('Y-m-d');
 
 $enviadosHoy = $pdo->query("SELECT COUNT(*) FROM cola_mensajes WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
-if ($enviadosHoy >= 2000) {
-    die("Límite diario de 2,000 mensajes alcanzado.");
+if ($enviadosHoy >= 3560) {
+    die("Límite diario de 3,560 mensajes alcanzado.");
 }
 
-// 2. Tomar los siguientes 400 mensajes pendientes
-$stmt = $pdo->query("SELECT * FROM cola_mensajes WHERE estado = 'pendiente' ORDER BY id ASC LIMIT 400");
+// 2. Tomar los siguientes 900 mensajes pendientes
+$stmt = $pdo->query("SELECT * FROM cola_mensajes WHERE estado = 'pendiente' ORDER BY id ASC LIMIT 900");
 $lote = $stmt->fetchAll();
 
 if ($lote) {
@@ -89,11 +89,11 @@ if ($lote) {
 
         $contador++;
         
-        if($contador%10==0){        
+        if($contador%30==0){        
             // Pausa tras cada mensaje    
             sleep(1); 
         }
-        
+
     }
     echo "Lote de " . count($lote) . " mensajes procesado.";
 } else {
