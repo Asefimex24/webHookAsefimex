@@ -1,5 +1,5 @@
 function cargarMensajes() {
-    fetch('../response/get_messages.php')
+    fetch('https://asefimex.com/HookAsefimex/response/get_messages.php')
     
         .then(response => response.text())
         .then(html => {

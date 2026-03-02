@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi WhatsApp Webhook Dash</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f0f2f5; overflow: hidden; }
+        .main-container { height: 100vh; padding: 20px 0; }
+        .chat-app { background: #fff; height: 90vh; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 5px; }
+        
+        /* Lista de contactos */
+        .contacts-section { border-right: 1px solid #ddd; height: 100%; display: flex; flex-direction: column; }
+        .contact-list { overflow-y: auto; flex-grow: 1; }
+        .contact-item { cursor: pointer; border-bottom: 1px solid #f2f2f2; transition: 0.3s; }
+        .contact-item:hover { background-color: #f5f6f6; }
+        .contact-item.active { background-color: #ebebeb; }
+
+        /* Área de Chat */
+        .chat-section { height: 100%; display: flex; flex-direction: column; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
+        .chat-header { background: #f0f2f5; padding: 10px 16px; border-bottom: 1px solid #ddd; }
+        .chat-body { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .chat-footer { background: #f0f2f5; padding: 10px; }
+
+        /* Burbujas de mensaje */
+        .message { max-width: 65%; margin-bottom: 12px; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; position: relative; }
+        .msg-received { background: #fff; align-self: flex-start; border-top-left-radius: 0; }
+        .msg-sent { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
+        .msg-time { font-size: 0.7rem; color: #888; text-align: right; display: block; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container main-container">
+    <div class="row g-0 chat-app">
+        
+        <div class="col-md-4 contacts-section">
+
+            <div class="chat-header d-flex justify-content-between align-items-center">
+                <img src="https://ui-avatars.com/api/?name=Negocio&background=0D8ABC&color=fff" class="rounded-circle" width="40">
+                <div>
+                    <i class="bi bi-chat-left-text-fill me-3 text-secondary"></i>
+                    <i class="bi bi-three-dots-vertical text-secondary"></i>
+                </div>
+            </div>
+            
+            <div class="bg-light p-2">
+                <input type="text" class="form-control form-control-sm" placeholder="Buscar o empezar un chat">
+            </div>
+
+            <div class="contact-list">
+                <div class="contact-item p-3 d-flex align-items-center active">
+                    <img src="https://ui-avatars.com/api/?name=Juan+Perez" class="rounded-circle me-3" width="45">
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-0 text-truncate" style="max-width: 150px;">+52 189 150 2312</h6>
+                            <small class="text-muted">12:45 PM</small>
+                        </div>
+                        <small class="text-muted text-truncate d-block" style="max-width: 200px;">Hola, ¿tienen disponibilidad?</small>
+                    </div>
+                </div>
+                </div>
+        </div>
+
+        <div class="col-md-8 chat-section">
+            <div class="chat-header d-flex align-items-center">
+                <img src="https://ui-avatars.com/api/?name=Juan+Perez" class="rounded-circle me-3" width="40">
+                <div>
+                    <h6 class="mb-0">+52 189 150 2312</h6>
+                    <small class="text-success">En línea</small>
+                </div>
+            </div>
+
+            <div class="chat-body d-flex flex-column">
+                <div class="message msg-received">
+                    Hola, me gustaría saber el precio de sus servicios.
+                    <span class="msg-time">12:40 PM</span>
+                </div>
+
+                <div class="message msg-sent">
+                    ¡Claro! Con gusto te envío nuestro catálogo.
+                    <span class="msg-time">12:42 PM</span>
+                </div>
+                
+                <div class="message msg-received">
+                    Perfecto, quedo a la espera.
+                    <span class="msg-time">12:45 PM</span>
+                </div>
+                   <div class="message msg-received">
+                    Hola, me gustaría saber el precio de sus servicios.
+                    <span class="msg-time">12:40 PM</span>
+                </div>
+
+                <div class="message msg-sent">
+                    ¡Claro! Con gusto te envío nuestro catálogo.
+                    <span class="msg-time">12:42 PM</span>
+                </div>
+                
+                <div class="message msg-received">
+                    Perfecto, quedo a la espera.
+                    <span class="msg-time">12:45 PM</span>
+                </div>
+                   <div class="message msg-received">
+                    Hola, me gustaría saber el precio de sus servicios.
+                    <span class="msg-time">12:40 PM</span>
+                </div>
+
+                <div class="message msg-sent">
+                    ¡Claro! Con gusto te envío nuestro catálogo.
+                    <span class="msg-time">12:42 PM</span>
+                </div>
+                
+                <div class="message msg-received">
+                    Perfecto, quedo a la espera.
+                    <span class="msg-time">12:45 PM</span>
+                </div>
+                
+            </div>
+
+            <div class="chat-footer">
+                <div class="input-group">
+                    <!-- <button class="btn text-secondary"><i class="bi bi-emoji-smile"></i></button>
+                    <button class="btn text-secondary"><i class="bi bi-paperclip"></i></button> -->
+                    <input type="text" class="form-control border-0" placeholder="Escribe un mensaje aquí">
+                    <button class="btn btn-success"><i class="bi bi-send-fill"></i></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
