@@ -57,7 +57,7 @@ if ($lote) {
 
 
                 // Marcar como enviado en la cola de mensajes
-                $update = $pdo->prepare("UPDATE mensajes_lealtad SET estado = 'enviado', enviado_en ='" . $hoy . "' WHERE idCliente = ?");
+                $update = $pdo->prepare("UPDATE mensajes_lealtad SET estado = 'enviado', enviado_en = NOW() WHERE idCliente = ?");
                 $update->execute([$tarea['idCliente']]);
 
 
