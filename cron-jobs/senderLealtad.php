@@ -9,6 +9,8 @@ date_default_timezone_set("America/Mexico_City");
 require_once __DIR__ . '/twilio/sdk/src/Twilio/autoload.php';
 
 use Twilio\Rest\Client;
+include "config.php";
+
 
 $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 $pdo = new PDO($dsn, $usr, $psd);
@@ -24,7 +26,7 @@ if ($enviadosHoy >= 5000) {
 }
 
 // Tomar los siguientes 800 mensajes pendientes
-$stmt = $pdo->query("SELECT * FROM mensajes_lealtad WHERE estado = 'pendiente' ORDER BY idCliente ASC LIMIT 800");
+$stmt = $pdo->query("SELECT * FROM mensajes_lealtad WHERE estado = 'pendiente' ORDER BY idRegistro ASC LIMIT 800");
 $lote = $stmt->fetchAll();
 
 
@@ -57,8 +59,8 @@ if ($lote) {
 
 
                 // Marcar como enviado en la cola de mensajes
-                $update = $pdo->prepare("UPDATE mensajes_lealtad SET estado = 'enviado', enviado_en = NOW() WHERE idCliente = ?");
-                $update->execute([$tarea['idCliente']]);
+                $update = $pdo->prepare("UPDATE mensajes_lealtad SET estado = 'enviado', enviado_en = NOW() WHERE idRegistro = ?");
+                $update->execute([$tarea['idRegistro']]);
 
 
 
@@ -85,15 +87,15 @@ Si no deseas recibir más mensajes promocionales de nuestra parte, responde con 
 
                 //si hay un error al enviar el mensaje, marcar como fallido
                 echo "Error al enviar mensaje a " . $tarea['celular'] . ": " . $e->getMessage() . "\n";
-                $update = $pdo->prepare("UPDATE mensajes_lealtad SET estado = 'fallido' WHERE idCliente = ?");
-                $update->execute([$tarea['idCliente']]);
+                $update = $pdo->prepare("UPDATE mensajes_lealtad SET estado = 'fallido' WHERE idRegistro = ?");
+                $update->execute([$tarea['idRegistro']]);
             }
         } else {
 
             // Marcar como fallido por número inválido
-            echo "Número inválido para el cliente ID " . $tarea['idCliente'] . ": " . $tarea['celular'] . "\n";
-            $update = $pdo->prepare("UPDATE mensajes_lealtad SET estado = 'fallido', enviado_en = NOW() WHERE idCliente = ?");
-            $update->execute([$tarea['idCliente']]);
+            echo "Número inválido para el cliente ID " . $tarea['idRegistro'] . ": " . $tarea['celular'] . "\n";
+            $update = $pdo->prepare("UPDATE mensajes_lealtad SET estado = 'fallido', enviado_en = NOW() WHERE idRegistro = ?");
+            $update->execute([$tarea['idRegistro']]);
             continue;
         }
 
