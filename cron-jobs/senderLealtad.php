@@ -1,6 +1,7 @@
 <?php
 
 //script que permite enviar mensajes del programa de de lealtad a los clientes
+set_time_limit(0);
 echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
 
 date_default_timezone_set("America/Mexico_City");
@@ -9,29 +10,34 @@ require_once __DIR__ . '/twilio/sdk/src/Twilio/autoload.php';
 
 use Twilio\Rest\Client;
 
-$dsn = "mysql:host=localhost;dbname=myDb;charset=utf8mb4";
-$pdo = new PDO($dsn, 'usr', 'psd');
+$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
+$pdo = new PDO($dsn, $usr, $psd);
 $pdo->exec("SET time_zone = '-06:00'");
 
-// 1. Verificar límite diario (opcional pero recomendado)
+// Verificar límite diario (opcional pero recomendado)
 $hoy = date('Y-m-d');
 
 $enviadosHoy = $pdo->query("SELECT COUNT(*) FROM mensajes_lealtad WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
-if ($enviadosHoy >= 250) {
-    die("Límite diario de 250 mensajes alcanzado.");
+if ($enviadosHoy >= 5000) {
+    die("Límite diario de 5,000 mensajes alcanzado.");
 }
 
-// 2. Tomar los siguientes 10 mensajes pendientes
-$stmt = $pdo->query("SELECT * FROM mensajes_lealtad WHERE estado = 'pendiente' ORDER BY idCliente ASC LIMIT 25");
+// Tomar los siguientes 800 mensajes pendientes
+$stmt = $pdo->query("SELECT * FROM mensajes_lealtad WHERE estado = 'pendiente' ORDER BY idCliente ASC LIMIT 800");
 $lote = $stmt->fetchAll();
+
+
 
 if ($lote) {
 
-    //cargar los datos de cuenta twilio      
-    $sid = '';
-    $token = '';
+    //cargar los datos de cuenta twilio
+    $sid = $sidtw;
+    $token = $tokentw;
     $twilio = new Client($sid, $token);
+
+    //contador para validar el envio de 30 mensajes y poner delay de 1 seg.
+    $contador=1;
 
     foreach ($lote as $tarea) {
 
@@ -90,6 +96,15 @@ Si no deseas recibir más mensajes promocionales de nuestra parte, responde con 
             $update->execute([$tarea['idCliente']]);
             continue;
         }
+
+
+                
+        if($contador%30==0){        
+            // Pausa tras cada 30 mensajes    
+            sleep(1); 
+        }
+
+        $contador++;
     }
 
     echo "Lote de " . count($lote) . " mensajes procesado.";

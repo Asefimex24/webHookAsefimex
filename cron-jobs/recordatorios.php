@@ -16,17 +16,17 @@ $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 $pdo = new PDO($dsn, $usr, $psd);
 $pdo->exec("SET time_zone = '-06:00'");
 
-// 1. Verificar límite diario (opcional pero recomendado)
+// Verificar límite diario (opcional pero recomendado)
 $hoy = date('Y-m-d');
 
 $enviadosHoy = $pdo->query("SELECT COUNT(*) FROM cola_mensajes WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
-if ($enviadosHoy >= 3560) {
-    die("Límite diario de 3,560 mensajes alcanzado.");
+if ($enviadosHoy >= 5000) {
+    die("Límite diario de 4,000 mensajes alcanzado.");
 }
 
-// 2. Tomar los siguientes 900 mensajes pendientes
-$stmt = $pdo->query("SELECT * FROM cola_mensajes WHERE estado = 'pendiente' ORDER BY id ASC LIMIT 900");
+// Tomar los siguientes 800 mensajes pendientes
+$stmt = $pdo->query("SELECT * FROM cola_mensajes WHERE estado = 'pendiente' ORDER BY id ASC LIMIT 800");
 $lote = $stmt->fetchAll();
 
 if ($lote) {
@@ -36,7 +36,7 @@ if ($lote) {
     $token = $tokentw;
     $twilio = new Client($sid, $token);
 
-    //contador para validar el envio de 10 mensajes y poner delay de 1 seg.
+    //contador para validar el envio de 30 mensajes y poner delay de 1 seg.
     $contador=1;
 
     foreach ($lote as $tarea) {
@@ -87,12 +87,14 @@ if ($lote) {
             continue;
         }
 
-        $contador++;
+
         
         if($contador%30==0){        
-            // Pausa tras cada mensaje    
+            // Pausa tras cada 30 mensajes    
             sleep(1); 
         }
+
+        $contador++;
 
     }
     echo "Lote de " . count($lote) . " mensajes procesado.";
