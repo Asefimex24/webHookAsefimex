@@ -1,7 +1,7 @@
 <?php
 //script para realizar envio de notificaciones de recordatorios de pago a los clientes
 //mediante whatsapp usando plantillas de twilio
-//ejecutar este script cada 10 minutos mediante cron job
+//ejecutar este script cada 15 minutos mediante cron job
 set_time_limit(0);
 echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
 
@@ -22,7 +22,7 @@ $hoy = date('Y-m-d');
 $enviadosHoy = $pdo->query("SELECT COUNT(*) FROM cola_mensajes WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
 if ($enviadosHoy >= 5000) {
-    die("Límite diario de 4,000 mensajes alcanzado.");
+    die("Límite diario de 5,000 mensajes alcanzado.");
 }
 
 // Tomar los siguientes 800 mensajes pendientes
@@ -44,7 +44,7 @@ if ($lote) {
         // Validar que el número tenga exactamente 10 dígitos
         if (mb_strlen($tarea['telefono'], "UTF-8") == 10) {
 
-            // Mapeamos tus columnas a las variables de la plantilla {{1}}, {{2}}, {{3}}
+            // Mapeamos las columnas a las variables de la plantilla {{1}}, {{2}}, {{3}}
             $plantillaVariables = [
                 "1" => $tarea['nombreCliente'], // Variable {{1}}
                 "2" => $tarea['idCredito'],     // Variable {{2}}
@@ -55,8 +55,8 @@ if ($lote) {
                 $twilio->messages->create(
                     "whatsapp:+521" . $tarea['telefono'], // Destinatario
                     [
-                        "from" => "whatsapp:+5219612049936", // Tu número de Twilio
-                        "contentSid" => "HXcdd5acc673aebc5833ddfc05bcb1354c", // Tu SID de plantilla
+                        "from" => "whatsapp:+5219612049936", // número de Twilio
+                        "contentSid" => "HX93c02b5c808fd872e5b21957eae172d3", // SID de plantilla
                         "contentVariables" => json_encode($plantillaVariables) // Variables de la plantilla
                     ]
                 );
@@ -67,8 +67,9 @@ if ($lote) {
 
                 //estructura del mensaje para guardar en la tabla de mensajes_whatsapp
                 $messageBody = 'Estimado(a) ' . $tarea['nombreCliente'] . ', Asefimex le informa que el pago de su crédito #' . $tarea['idCredito'] . ' vence el próximo ' . $tarea['proxPago'] . '.
-                                Le sugerimos realizar su pago puntualmente para mantener sus beneficios. Una vez realizado, 
-                                por favor envíe su comprobante a su ejecutivo asignado. ¡Gracias!';
+                                Le sugerimos realizar su pago puntualmente para evitar cargos adicionales y mantener el estado de su cuenta al corriente. 
+                                NOTA:Si ya realizó su pago haga caso omiso a este mensaje.';
+
 
                 //guardar en tabla de mensajes_whatsapp para poder ver el historial de mensajes que responden los clientes.
                 $sql = "INSERT INTO mensajes_whatsapp (remitente, mensaje, direccion) VALUES (?, ?, 'saliente')";
