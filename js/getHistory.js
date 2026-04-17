@@ -1,53 +1,62 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const contactItems = document.querySelectorAll('.contact-item');
-    const chatBody = document.querySelector('.chat-body d-flex flex-column');
-    const chatHeaderName = document.querySelector('.chat-header d-flex align-items-center');
+
+    const contactItems = document.querySelectorAll('.contact-list');
+    const chatHeaderPhone = document.getElementById('chat-contact-phone');
+    //validar si el chat tiene alguna imagen de perfil, si no tiene, colocar una imagen por defecto
+    const chatHeaderImg = document.getElementById('chat-contact-img');
+    const chatBody = document.getElementById('chat-body');
 
     contactItems.forEach(item => {
-        item.addEventListener('click', function() {
-            // 1. Estética: Quitar clase 'active' de otros y ponerla en este
-            contactItems.forEach(i => i.classList.remove('active'));
-            this.classList.add('active');
+        item.addEventListener('click', function (event) {
 
-            // 2. Obtener el teléfono del atributo data
-            const phone = this.getAttribute('data-phone');
-            chatHeaderName.innerText = '+' + phone; // Actualizar nombre en el header
+            // 1. Obtener datos del contacto clickeado
+            const phone = event.target.closest('.contact-item').getAttribute('data-phone');
+            const name = this.querySelector('h6').innerText;
+            const imgUrl = this.querySelector('img').src;
 
-            // 3. Llamar a la base de datos
+            console.log(phone);
+            //Agregar el numero de telefono al header del chat
+            chatHeaderPhone.innerText = phone;
+
+            
+            // Quitar la clase 'active' de todos los contactos
+            document.querySelectorAll('.contact-item').forEach(c => c.classList.remove('active'));
+            // Agregarlo al que acabamos de clickear
+            event.target.closest('.contact-item').classList.add('active');
+
+            // 4. Cargar mensajes (Simulación de una petición a BD o API)
             loadMessages(phone);
         });
     });
 
-    async function loadMessages(phone) {
-        chatBody.innerHTML = '<div class="text-center mt-5"><div class="spinner-border text-success"></div></div>';
+    function loadMessages(phone) {
+        // Aquí normalmente harías un fetch() a tu servidor
 
-        try {
-            const response = await fetch(`response/getHistory.php?remitente==${phone}`);
-            const messages = await response.json();
+        // Por ahora, limpiaremos el chat y pondremos un mensaje de carga
+        chatBody.innerHTML = '<div class="text-center my-auto">Cargando mensajes...</div>';
 
-            chatBody.innerHTML = ''; // Limpiar el spinner
+        // Simulación de carga de datos
+        setTimeout(() => {
+            chatBody.innerHTML = ''; // Limpiar el "cargando"
 
-            messages.forEach(msg => {
-                // Determinar si el mensaje es enviado o recibido
-                // Ajusta 'tipo' según tu columna en la DB (ej: 'sent' o 'received')
-                const isSent = msg.tipo === 'sent'; 
-                const msgClass = isSent ? 'msg-sent' : 'msg-received';
+            // Ejemplo de estructura de mensajes que recibirías
+            const mockMessages = [
+                { text: "Hola, vi su anuncio del número " + phone, time: "10:00 AM", type: "received" },
+                { text: "¡Hola! En qué podemos ayudarte.", time: "10:05 AM", type: "sent" }
+            ];
 
-                const messageHtml = `
-                    <div class="message ${msgClass}">
-                        ${msg.texto}
-                        <span class="msg-time">${msg.hora}</span>
-                    </div>
+            mockMessages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `message msg-${msg.type}`;
+                msgDiv.innerHTML = `
+                    ${msg.text}
+                    <span class="msg-time">${msg.time}</span>
                 `;
-                chatBody.innerHTML += messageHtml;
+                chatBody.appendChild(msgDiv);
             });
 
-            // 4. Scroll automático al final
+            // Scroll automático al final
             chatBody.scrollTop = chatBody.scrollHeight;
-
-        } catch (error) {
-            console.error('Error cargando mensajes:', error);
-            chatBody.innerHTML = '<p class="text-danger text-center">Error al cargar el historial.</p>';
-        }
+        }, 500);
     }
 });

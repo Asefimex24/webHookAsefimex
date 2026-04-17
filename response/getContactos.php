@@ -18,7 +18,7 @@ foreach ($mensajes as $m):
 
 ?>
     <div class="contact-item p-3 d-flex align-items-center" data-phone="<?php echo $m['remitente']; ?>">
-        <img src="https://ui-avatars.com/api/?name=Cliente+Asefimex" class="rounded-circle me-3" width="45">
+        <img src="https://ui-avatars.com/api/?name=Cliente+Asefimex" id="chat-contact-img" class="rounded-circle me-3" width="45">
         <div class="w-100">
             <div class="d-flex justify-content-between">
                 <h6 class="mb-0 text-truncate" style="max-width: 150px;"><?php echo $m['remitente']; ?></h6>

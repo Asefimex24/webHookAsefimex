@@ -20,3 +20,9 @@ body { background-color: #f0f2f5; overflow: hidden; }
         .msg-received { background: #fff; align-self: flex-start; border-top-left-radius: 0; }
         .msg-sent { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
         .msg-time { font-size: 0.7rem; color: #888; text-align: right; display: block; margin-top: 4px; }
+
+
+        .contact-item.active {
+    background-color: #f0f2f5;
+    border-left: 4px solid #25D366; /* El verde de WhatsApp */
+}
