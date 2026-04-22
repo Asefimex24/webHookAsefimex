@@ -17,8 +17,8 @@ body { background-color: #f0f2f5; overflow: hidden; }
 
         /* Burbujas de mensaje */
         .message { max-width: 65%; margin-bottom: 12px; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; position: relative; }
-        .msg-received { background: #fff; align-self: flex-start; border-top-left-radius: 0; }
-        .msg-sent { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
+        .msg-entrante { background: #fff; align-self: flex-start; border-top-left-radius: 0; }
+        .msg-saliente { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
         .msg-time { font-size: 0.7rem; color: #888; text-align: right; display: block; margin-top: 4px; }
 
 

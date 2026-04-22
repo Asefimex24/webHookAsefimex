@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $to = $_POST['to']; // Ejemplo: whatsapp:+521...
     $messageBody = $_POST['message'];
 
-    //1. Enviar vía Twilio
+    // Enviar vía Twilio
     $sid = "TU_ACCOUNT_SID";
     $token = "TU_AUTH_TOKEN";
     $twilio = new Client($sid, $token);
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             "body" => $messageBody
         ]);
 
-        // 2. Guardar en Base de Datos como 'saliente'
+        // Guardar en Base de Datos como 'saliente'
         $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8";
         $pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
         $pdo->exec("SET time_zone = '-06:00'");

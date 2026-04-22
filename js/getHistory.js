@@ -7,18 +7,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatBody = document.getElementById('chat-body');
 
     contactItems.forEach(item => {
+
         item.addEventListener('click', function (event) {
 
-            // 1. Obtener datos del contacto clickeado
+            //limpiar el input del ultimo chat, en caso de que el usuario haya escrito algo
+            document.querySelector('.chat-footer input').value = '';
+
+            //Obtener datos del contacto clickeado
             const phone = event.target.closest('.contact-item').getAttribute('data-phone');
-            const name = this.querySelector('h6').innerText;
-            const imgUrl = this.querySelector('img').src;
+            // const name = this.querySelector('h6').innerText;
+            // const imgUrl = this.querySelector('img').src;
 
             console.log(phone);
             //Agregar el numero de telefono al header del chat
             chatHeaderPhone.innerText = phone;
 
-            
+
             // Quitar la clase 'active' de todos los contactos
             document.querySelectorAll('.contact-item').forEach(c => c.classList.remove('active'));
             // Agregarlo al que acabamos de clickear
@@ -30,33 +34,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function loadMessages(phone) {
-        // Aquí normalmente harías un fetch() a tu servidor
+        const chatBody = document.getElementById('chat-body');
 
-        // Por ahora, limpiaremos el chat y pondremos un mensaje de carga
-        chatBody.innerHTML = '<div class="text-center my-auto">Cargando mensajes...</div>';
+        // 1. Mostrar estado de carga
+        chatBody.innerHTML = `
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border text-success" role="status"></div>
+        </div>`;
 
-        // Simulación de carga de datos
-        setTimeout(() => {
-            chatBody.innerHTML = ''; // Limpiar el "cargando"
+        // 2. Hacer la petición al backend
+        fetch(`response/getHistoryPhone.php?phone=${encodeURIComponent(phone)}`)
+            .then(response => response.json())
+            .then(messages => {
+                chatBody.innerHTML = ''; // Limpiar spinner
 
-            // Ejemplo de estructura de mensajes que recibirías
-            const mockMessages = [
-                { text: "Hola, vi su anuncio del número " + phone, time: "10:00 AM", type: "received" },
-                { text: "¡Hola! En qué podemos ayudarte.", time: "10:05 AM", type: "sent" }
-            ];
+                if (messages.length === 0) {
+                    chatBody.innerHTML = '<div class="text-center text-muted my-auto">No hay mensajes previos.</div>';
+                    return;
+                }
 
-            mockMessages.forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = `message msg-${msg.type}`;
-                msgDiv.innerHTML = `
+                // 3. Renderizar cada mensaje
+                messages.forEach(msg => {
+                    const msgDiv = document.createElement('div');
+                    // Asignamos la clase según si es 'sent' o 'received'
+                    msgDiv.className = `message msg-${msg.type}`;
+                    msgDiv.innerHTML = `
                     ${msg.text}
                     <span class="msg-time">${msg.time}</span>
                 `;
-                chatBody.appendChild(msgDiv);
-            });
+                    chatBody.appendChild(msgDiv);
+                });
 
-            // Scroll automático al final
-            chatBody.scrollTop = chatBody.scrollHeight;
-        }, 500);
+                // 4. Scroll al fondo automático
+                chatBody.scrollTop = chatBody.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                chatBody.innerHTML = '<div class="text-center text-danger">Error al cargar mensajes.</div>';
+            });
     }
+
 });
