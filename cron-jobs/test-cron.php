@@ -6,10 +6,10 @@ echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
 date_default_timezone_set("America/Mexico_City");
 
 
-include "config.php";
+require_once __DIR__ . '/../getEnv.php';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-$pdo = new PDO($dsn, $usr, $psd);
+$dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
+$pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
 $pdo->exec("SET time_zone = '-06:00'");
 
 $lote = 400;

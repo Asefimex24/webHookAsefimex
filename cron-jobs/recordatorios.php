@@ -7,13 +7,12 @@ echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
 
 date_default_timezone_set("America/Mexico_City");
 
-require_once __DIR__ . '/twilio/sdk/src/Twilio/autoload.php';
+require_once __DIR__ . '/../getEnv.php';
 
 use Twilio\Rest\Client;
-include "config.php";
 
-$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-$pdo = new PDO($dsn, $usr, $psd);
+$dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
+$pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
 $pdo->exec("SET time_zone = '-06:00'");
 
 // Verificar límite diario (opcional pero recomendado)
@@ -32,8 +31,8 @@ $lote = $stmt->fetchAll();
 if ($lote) {
 
     //cargar los datos de cuenta twilio
-    $sid = $sidtw;
-    $token = $tokentw;
+    $sid = $_ENV['TWILIO_ACCOUNT_SID'];
+    $token = $_ENV['TWILIO_AUTH_TOKEN'];
     $twilio = new Client($sid, $token);
 
     //contador para validar el envio de 30 mensajes y poner delay de 1 seg.
