@@ -6,6 +6,11 @@ echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
 
 date_default_timezone_set("America/Mexico_City");
 
+//mostrar errores en tiempo de ejecucion
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../getEnv.php';
 
 use Twilio\Rest\Client;
@@ -64,11 +69,15 @@ if ($lote) {
 
                 
                 //componer el mensaje para guardar en la tabla de mensajes_whatsapp
-                $messageBody = '¡Hola! 👋
-                                En Asefimex queremos premiar tu recomendación.
-                                Si nos refieres a una persona que compre a crédito un Motocarro Piaggio con nosotros, ¡te damos un bono de $1,000 pesos! 💰
-                                Es muy fácil: compártenos el nombre y teléfono de tu referido registrando los datos en el siguiente enlace. 👇
-                                Si la compra se concreta, ¡el bono es tuyo!';
+                $messageBody = '¡Beneficio Especia para tíl!
+Realiza tu pago del 27 al 30 de marzo de 2026 y participa:
+
+Sorteo de $12,000 que será abonado directamente a tu crédito.
+Fecha del sorteo 10 de Abril 2026.
+
+Es tu oportunidad de avanzar más rápido, reducir tu saldo y seguir creciendo con nosotros. 
+No dejes pasar esta oportunidad, ponte al corriente y participa.
+¡Haz tu pago dentro de las fechas y asegura tu lugar en el sorteo!';
 
 
                 //guardar en tabla de mensajes_whatsapp para poder ver el historial de mensajes que responden los clientes.
@@ -79,21 +88,21 @@ if ($lote) {
 
                 //si hay un error al enviar el mensaje, marcar como fallido
                 echo "Error al enviar mensaje a " . $tarea['celular'] . ": " . $e->getMessage() . "\n";
-                $update = $pdo->prepare("UPDATE promocion_referidos SET estado = 'fallido' WHERE idRegistro = ?");
+                $update = $pdo->prepare("UPDATE promocion SET estado = 'fallido' WHERE idRegistro = ?");
                 $update->execute([$tarea['idRegistro']]);
             }
         } else {
 
             // Marcar como fallido por número inválido
             echo "Número inválido para el cliente ID " . $tarea['idRegistro'] . ": " . $tarea['celular'] . "\n";
-            $update = $pdo->prepare("UPDATE promocion_referidos SET estado = 'fallido', enviado_en = NOW() WHERE idRegistro = ?");
+            $update = $pdo->prepare("UPDATE promocion SET estado = 'fallido', enviado_en = NOW() WHERE idRegistro = ?");
             $update->execute([$tarea['idRegistro']]);
             continue;
         }
 
 
                 
-        if($contador%50==0){        
+        if($contador%30==0){        
             // Pausa tras cada 30 mensajes    
             sleep(1); 
         }

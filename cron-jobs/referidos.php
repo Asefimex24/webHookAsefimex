@@ -20,7 +20,7 @@ $hoy = date('Y-m-d');
 $enviadosHoy = $pdo->query("SELECT COUNT(*) FROM promocion_referidos WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
 if ($enviadosHoy >= 4000) {
-    die("Límite diario de 4,000 mensajes alcanzado.");
+    die('Límite diario de 4,000 mensajes alcanzado.');
 }
 
 // Tomar los siguientes 800 mensajes pendientes
@@ -64,15 +64,11 @@ if ($lote) {
 
                 
                 //componer el mensaje para guardar en la tabla de mensajes_whatsapp
-                $messageBody = '¡Beneficio Especia para tíl!
-Realiza tu pago del 27 al 30 de marzo de 2026 y participa:
-
-Sorteo de $12,000 que será abonado directamente a tu crédito.
-Fecha del sorteo 10 de Abril 2026.
-
-Es tu oportunidad de avanzar más rápido, reducir tu saldo y seguir creciendo con nosotros. 
-No dejes pasar esta oportunidad, ponte al corriente y participa.
-¡Haz tu pago dentro de las fechas y asegura tu lugar en el sorteo!';
+                $messageBody = '¡Hola! 👋
+                                En Asefimex queremos premiar tu recomendación.
+                                Si nos refieres a una persona que compre a crédito un Motocarro Piaggio con nosotros, ¡te damos un bono de $1,000 pesos! 💰
+                                Es muy fácil: compártenos el nombre y teléfono de tu referido registrando los datos en el siguiente enlace. 👇
+                                Si la compra se concreta, ¡el bono es tuyo!';
 
 
                 //guardar en tabla de mensajes_whatsapp para poder ver el historial de mensajes que responden los clientes.
@@ -83,19 +79,17 @@ No dejes pasar esta oportunidad, ponte al corriente y participa.
 
                 //si hay un error al enviar el mensaje, marcar como fallido
                 echo "Error al enviar mensaje a " . $tarea['celular'] . ": " . $e->getMessage() . "\n";
-                $update = $pdo->prepare("UPDATE promocion SET estado = 'fallido' WHERE idRegistro = ?");
+                $update = $pdo->prepare("UPDATE promocion_referidos SET estado = 'fallido' WHERE idRegistro = ?");
                 $update->execute([$tarea['idRegistro']]);
             }
         } else {
 
             // Marcar como fallido por número inválido
             echo "Número inválido para el cliente ID " . $tarea['idRegistro'] . ": " . $tarea['celular'] . "\n";
-            $update = $pdo->prepare("UPDATE promocion SET estado = 'fallido', enviado_en = NOW() WHERE idRegistro = ?");
+            $update = $pdo->prepare("UPDATE promocion_referidos SET estado = 'fallido', enviado_en = NOW() WHERE idRegistro = ?");
             $update->execute([$tarea['idRegistro']]);
             continue;
         }
-
-
                 
         if($contador%30==0){        
             // Pausa tras cada 30 mensajes    
