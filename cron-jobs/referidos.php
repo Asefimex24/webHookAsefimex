@@ -17,14 +17,14 @@ $pdo->exec("SET time_zone = '-06:00'");
 // Verificar límite diario (opcional pero recomendado)
 $hoy = date('Y-m-d');
 
-$enviadosHoy = $pdo->query("SELECT COUNT(*) FROM promocion WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
+$enviadosHoy = $pdo->query("SELECT COUNT(*) FROM promocion_referidos WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
 if ($enviadosHoy >= 4000) {
     die("Límite diario de 4,000 mensajes alcanzado.");
 }
 
 // Tomar los siguientes 800 mensajes pendientes
-$stmt = $pdo->query("SELECT * FROM promocion WHERE estado = 'pendiente' ORDER BY idRegistro ASC LIMIT 800");
+$stmt = $pdo->query("SELECT * FROM promocion_referidos WHERE estado = 'pendiente' ORDER BY idRegistro ASC LIMIT 800");
 $lote = $stmt->fetchAll();
 
 
@@ -51,24 +51,28 @@ if ($lote) {
                     "whatsapp:+521" . $tarea['celular'], // Destinatario
                     [
                         "from" => "whatsapp:+5219612049936", // Tu número de Twilio
-                        "contentSid" => "HX00862e317c53ece6070b4f0e822b09f1", // Tu SID de plantilla de contenido
+                        "contentSid" => "HX1542a7ea451c1b24c2d0044a9cefb294", // Tu SID de plantilla de contenido
                     ]
                 );
 
 
                 // Marcar como enviado en la cola de mensajes
-                $update = $pdo->prepare("UPDATE promocion SET estado = 'enviado', enviado_en = NOW() WHERE idRegistro = ?");
+                $update = $pdo->prepare("UPDATE promocion_referidos SET estado = 'enviado', enviado_en = NOW() WHERE idRegistro = ?");
                 $update->execute([$tarea['idRegistro']]);
 
 
 
                 
                 //componer el mensaje para guardar en la tabla de mensajes_whatsapp
-                $messageBody = '¡Hola! 👋
-                                En Asefimex queremos premiar tu recomendación.
-                                Si nos refieres a una persona que compre a crédito un Motocarro Piaggio con nosotros, ¡te damos un bono de $1,000 pesos! 💰
-                                Es muy fácil: compártenos el nombre y teléfono de tu referido registrando los datos en el siguiente enlace. 👇
-                                Si la compra se concreta, ¡el bono es tuyo!';
+                $messageBody = '¡Beneficio Especia para tíl!
+Realiza tu pago del 27 al 30 de marzo de 2026 y participa:
+
+Sorteo de $12,000 que será abonado directamente a tu crédito.
+Fecha del sorteo 10 de Abril 2026.
+
+Es tu oportunidad de avanzar más rápido, reducir tu saldo y seguir creciendo con nosotros. 
+No dejes pasar esta oportunidad, ponte al corriente y participa.
+¡Haz tu pago dentro de las fechas y asegura tu lugar en el sorteo!';
 
 
                 //guardar en tabla de mensajes_whatsapp para poder ver el historial de mensajes que responden los clientes.
@@ -79,21 +83,21 @@ if ($lote) {
 
                 //si hay un error al enviar el mensaje, marcar como fallido
                 echo "Error al enviar mensaje a " . $tarea['celular'] . ": " . $e->getMessage() . "\n";
-                $update = $pdo->prepare("UPDATE promocion_referidos SET estado = 'fallido' WHERE idRegistro = ?");
+                $update = $pdo->prepare("UPDATE promocion SET estado = 'fallido' WHERE idRegistro = ?");
                 $update->execute([$tarea['idRegistro']]);
             }
         } else {
 
             // Marcar como fallido por número inválido
             echo "Número inválido para el cliente ID " . $tarea['idRegistro'] . ": " . $tarea['celular'] . "\n";
-            $update = $pdo->prepare("UPDATE promocion_referidos SET estado = 'fallido', enviado_en = NOW() WHERE idRegistro = ?");
+            $update = $pdo->prepare("UPDATE promocion SET estado = 'fallido', enviado_en = NOW() WHERE idRegistro = ?");
             $update->execute([$tarea['idRegistro']]);
             continue;
         }
 
 
                 
-        if($contador%50==0){        
+        if($contador%30==0){        
             // Pausa tras cada 30 mensajes    
             sleep(1); 
         }

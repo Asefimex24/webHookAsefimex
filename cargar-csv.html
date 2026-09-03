@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargar CSV - Recordatorios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .drop-zone {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8f9fa;
+        }
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: #0d6efd;
+            background: #e9ecef;
+        }
+        .drop-zone.has-file {
+            border-color: #198754;
+            background: #d1e7dd;
+        }
+        .drop-zone-icon {
+            font-size: 2.5rem;
+            color: #6c757d;
+        }
+        .table-preview {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .table-preview thead {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">Asefimex - Notificaciones</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.txt+">Mensajes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index2.html">Chat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="cargar-csv.php">Cargar CSV</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col">
+                <h3 class="mb-1">Cargar Clientes desde CSV</h3>
+                <p class="text-muted mb-0">
+                    Sube un archivo CSV con los datos de los clientes para generar recordatorios de pago.
+                    Los registros se insertarán en la cola de mensajes con estado <strong>pendiente</strong>
+                    para que el cronjob los procese.
+                </p>
+            </div>
+        </div>
+
+        <!-- Step 1: Upload -->
+        <div class="card mb-4 shadow-sm" id="uploadCard">
+            <div class="card-body">
+                <h5 class="card-title mb-3">1. Selecciona el archivo CSV</h5>
+
+                <div class="drop-zone mb-3" id="dropZone" onclick="document.getElementById('csvInput').click()">
+                    <div class="drop-zone-icon mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+                        </svg>
+                    </div>
+                    <p class="mb-1" id="dropZoneText">Arrastra el archivo CSV aquí o haz clic para seleccionar</p>
+                    <small class="text-muted" id="dropZoneFile"></small>
+                    <input type="file" id="csvInput" accept=".csv" class="d-none">
+                </div>
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Delimitador</label>
+                        <select class="form-select" id="delimitador">
+                            <option value=",">Coma (,)</option>
+                            <option value=";">Punto y coma (;)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-grid">
+                        <button class="btn btn-primary" id="btnCargar" onclick="cargarCSV()" disabled>
+                            <span id="btnCargarText">Cargar y previsualizar</span>
+                            <div id="btnCargarSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
+                        </button>
+                    </div>
+                    <div class="col-md-3 d-grid">
+                        <button class="btn btn-outline-secondary" id="btnLimpiar" onclick="limpiarTodo()" disabled>
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div id="loadingSection" class="d-none text-center py-4">
+            <div class="spinner-border text-primary mb-2" role="status"></div>
+            <p class="text-muted">Procesando archivo...</p>
+        </div>
+
+        <!-- Step 2: Column Mapping -->
+        <div id="mappingSection" class="card mb-4 shadow-sm d-none">
+            <div class="card-body">
+                <h5 class="card-title mb-3">2. Mapeo de Columnas</h5>
+                <p class="text-muted small">
+                    Selecciona qué columna del CSV corresponde a cada campo requerido.
+                    Los campos marcados con <span class="text-danger">*</span> son obligatorios.
+                </p>
+                <div class="row g-3" id="mappingFields"></div>
+            </div>
+        </div>
+
+        <!-- Step 3: Preview + Save -->
+        <div id="previewSection" class="card mb-4 shadow-sm d-none">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <span class="fw-semibold">
+                    3. Vista Previa
+                    <span class="badge bg-primary rounded-pill ms-2" id="rowCount">0</span>
+                    <small class="text-muted ms-1">registros</small>
+                </span>
+                <button class="btn btn-success" id="btnGuardar" onclick="guardarCSV()">
+                    <span id="btnGuardarText">Guardar en Base de Datos</span>
+                    <div id="btnGuardarSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-preview">
+                    <table class="table table-sm table-striped table-hover mb-0" id="previewTable">
+                        <thead id="previewHeader" class="table-dark"></thead>
+                        <tbody id="previewBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Alert -->
+        <div id="statusAlert" class="d-none"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const csvInput = document.getElementById('csvInput');
+        const dropZone = document.getElementById('dropZone');
+        const dropZoneText = document.getElementById('dropZoneText');
+        const dropZoneFile = document.getElementById('dropZoneFile');
+        const btnCargar = document.getElementById('btnCargar');
+
+        // Drag & drop
+        dropZone.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', function () {
+            this.classList.remove('dragover');
+        });
+        dropZone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                csvInput.files = e.dataTransfer.files;
+                onFileSelect();
+            }
+        });
+        csvInput.addEventListener('change', onFileSelect);
+
+        function onFileSelect() {
+            const file = csvInput.files[0];
+            if (file) {
+                dropZone.classList.add('has-file');
+                dropZoneText.textContent = file.name;
+                dropZoneFile.textContent = (file.size / 1024).toFixed(1) + ' KB';
+                btnCargar.disabled = false;
+            } else {
+                dropZone.classList.remove('has-file');
+                dropZoneText.textContent = 'Arrastra el archivo CSV aquí o haz clic para seleccionar';
+                dropZoneFile.textContent = '';
+                btnCargar.disabled = true;
+            }
+        }
+
+        function mostrarAlerta(tipo, mensaje, detalle) {
+            const alert = document.getElementById('statusAlert');
+            alert.className = 'alert alert-' + tipo + ' alert-dismissible fade show d-block';
+            alert.innerHTML = '<strong>' + mensaje + '</strong>';
+            if (detalle) {
+                if (Array.isArray(detalle) && detalle.length) {
+                    const lista = detalle.slice(0, 10).map(function (e) { return '<li>' + e + '</li>'; }).join('');
+                    alert.innerHTML += '<ul class="mb-0 mt-1">' + lista + '</ul>';
+                    if (detalle.length > 10) {
+                        alert.innerHTML += '<p class="mb-0 mt-1 text-muted small">...y ' + (detalle.length - 10) + ' errores más</p>';
+                    }
+                } else {
+                    alert.innerHTML += '<p class="mb-0 mt-1">' + detalle + '</p>';
+                }
+            }
+            alert.innerHTML +=
+            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function ocultarAlerta() {
+            document.getElementById('statusAlert').className = 'd-none';
+        }
+
+        function cargarCSV() {
+            const file = csvInput.files[0];
+            if (!file) return;
+
+            ocultarAlerta();
+            document.getElementById('btnCargarText').classList.add('d-none');
+            document.getElementById('btnCargarSpinner').classList.remove('d-none');
+            document.getElementById('loadingSection').classList.remove('d-none');
+
+            const formData = new FormData();
+            formData.append('action', 'upload');
+            formData.append('csv', file);
+            formData.append('delimitador', document.getElementById('delimitador').value);
+
+            fetch('./response/procesar_csv.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    document.getElementById('btnCargarText').classList.remove('d-none');
+                    document.getElementById('btnCargarSpinner').classList.add('d-none');
+                    document.getElementById('loadingSection').classList.add('d-none');
+
+                    if (!data.success) {
+                        mostrarAlerta('danger', 'Error', data.error);
+                        return;
+                    }
+
+                    mostrarPreview(data);
+                })
+                .catch(function (err) {
+                    document.getElementById('btnCargarText').classList.remove('d-none');
+                    document.getElementById('btnCargarSpinner').classList.add('d-none');
+                    document.getElementById('loadingSection').classList.add('d-none');
+                    mostrarAlerta('danger', 'Error de conexión', err.message);
+                });
+        }
+
+        function mostrarPreview(data) {
+            const headers = data.headers;
+            const preview = data.preview;
+            const totalRows = data.totalRows;
+
+            // Mapping section
+            const mappingFields = document.getElementById('mappingFields');
+            const requiredFields = [
+                { campo: 'telefono', label: 'Teléfono (10 dígitos)', required: true },
+                { campo: 'nombreCliente', label: 'Nombre del Cliente', required: true },
+                { campo: 'idCredito', label: 'ID de Crédito', required: true },
+                { campo: 'proxPago', label: 'Próximo Pago', required: true }
+            ];
+
+            // Auto-detect mapping
+            function findMatch(header, keywords) {
+                var h = header.toLowerCase().replace(/[^a-z0-9]/g, '');
+                for (var k = 0; k < keywords.length; k++) {
+                    if (h.indexOf(keywords[k]) !== -1) return true;
+                }
+                return false;
+            }
+
+            mappingFields.innerHTML = '';
+            requiredFields.forEach(function (rf) {
+                var col = document.createElement('div');
+                col.className = 'col-md-3';
+
+                var label = document.createElement('label');
+                label.className = 'form-label';
+                label.textContent = rf.label + (rf.required ? ' *' : '');
+
+                var select = document.createElement('select');
+                select.className = 'form-select form-select-sm';
+                select.dataset.campo = rf.campo;
+                if (rf.required) select.required = true;
+
+                var emptyOpt = document.createElement('option');
+                emptyOpt.value = '';
+                emptyOpt.textContent = '-- Seleccionar --';
+                select.appendChild(emptyOpt);
+
+                var autoSelected = false;
+                headers.forEach(function (h) {
+                    var opt = document.createElement('option');
+                    opt.value = h;
+                    opt.textContent = h;
+
+                    var keywords = [];
+                    switch (rf.campo) {
+                        case 'telefono':
+                            keywords = ['telefono', 'tel', 'phone', 'celular', 'cel', 'movil', 'movil'];
+                            break;
+                        case 'nombreCliente':
+                            keywords = ['nombre', 'name', 'cliente', 'customer', 'apellido'];
+                            break;
+                        case 'idCredito':
+                            keywords = ['credito', 'credit', 'idcredito', 'folio', 'id_credito', 'no_credito'];
+                            break;
+                        case 'proxPago':
+                            keywords = ['pago', 'payment', 'fecha', 'date', 'proximo', 'prox', 'vencimiento', 'vence'];
+                            break;
+                    }
+
+                    if (!autoSelected && findMatch(h, keywords)) {
+                        opt.selected = true;
+                        autoSelected = true;
+                    }
+
+                    select.appendChild(opt);
+                });
+
+                col.appendChild(label);
+                col.appendChild(select);
+                mappingFields.appendChild(col);
+            });
+
+            // Preview table
+            var thead = document.getElementById('previewHeader');
+            var tbody = document.getElementById('previewBody');
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            var tr = document.createElement('tr');
+            headers.forEach(function (h) {
+                var th = document.createElement('th');
+                th.textContent = h;
+                tr.appendChild(th);
+            });
+            thead.appendChild(tr);
+
+            preview.forEach(function (row) {
+                var tr = document.createElement('tr');
+                headers.forEach(function (h) {
+                    var td = document.createElement('td');
+                    td.textContent = row[h] || '';
+                    td.className = 'text-truncate';
+                    td.style.maxWidth = '200px';
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('rowCount').textContent = totalRows;
+            document.getElementById('mappingSection').classList.remove('d-none');
+            document.getElementById('previewSection').classList.remove('d-none');
+            document.getElementById('btnLimpiar').disabled = false;
+
+            document.getElementById('mappingSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function guardarCSV() {
+            ocultarAlerta();
+
+            var mapping = {};
+            var selects = document.querySelectorAll('#mappingFields select');
+            var missing = [];
+            selects.forEach(function (sel) {
+                if (!sel.value) {
+                    var label = sel.closest('.col-md-3').querySelector('.form-label').textContent;
+                    missing.push(label);
+                }
+                mapping[sel.dataset.campo] = sel.value;
+            });
+
+            if (missing.length) {
+                mostrarAlerta('warning', 'Completa el mapeo', 'Faltan: ' + missing.join(', '));
+                return;
+            }
+
+            document.getElementById('btnGuardarText').classList.add('d-none');
+            document.getElementById('btnGuardarSpinner').classList.remove('d-none');
+
+            var formData = new FormData();
+            formData.append('action', 'save');
+            formData.append('mapping', JSON.stringify(mapping));
+
+            fetch('./response/procesar_csv.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    document.getElementById('btnGuardarText').classList.remove('d-none');
+                    document.getElementById('btnGuardarSpinner').classList.add('d-none');
+
+                    if (data.success) {
+                        var msg = 'Se insertaron ' + data.insertados + ' de ' + data.total + ' registros correctamente.';
+                        mostrarAlerta('success', 'Guardado exitoso', data.errores.length ? msg + ' Se omitieron ' + data
+                            .errores.length + ' registros con errores.' : msg);
+                        if (data.errores && data.errores.length) {
+                            // Show errors in a secondary alert
+                            var alert2 = document.createElement('div');
+                            alert2.className = 'alert alert-warning mt-2';
+                            alert2.innerHTML = '<strong>Errores por fila:</strong><ul class="mb-0 mt-1">' + data.errores
+                                .slice(0, 10).map(function (e) { return '<li>' + e + '</li>'; }).join('') + '</ul>';
+                            if (data.errores.length > 10) {
+                                alert2.innerHTML += '<p class="mb-0 mt-1 text-muted small">...y ' + (data.errores.length -
+                                    10) + ' errores más</p>';
+                            }
+                            document.getElementById('statusAlert').after(alert2);
+                        }
+                        limpiarTodo();
+                    } else {
+                        mostrarAlerta('danger', 'Error al guardar', data.error || 'Ocurrió un error desconocido');
+                    }
+                })
+                .catch(function (err) {
+                    document.getElementById('btnGuardarText').classList.remove('d-none');
+                    document.getElementById('btnGuardarSpinner').classList.add('d-none');
+                    mostrarAlerta('danger', 'Error de conexión', err.message);
+                });
+        }
+
+        function limpiarTodo() {
+            csvInput.value = '';
+            dropZone.classList.remove('has-file');
+            dropZoneText.textContent = 'Arrastra el archivo CSV aquí o haz clic para seleccionar';
+            dropZoneFile.textContent = '';
+            btnCargar.disabled = true;
+
+            document.getElementById('mappingSection').classList.add('d-none');
+            document.getElementById('previewSection').classList.add('d-none');
+            document.getElementById('btnLimpiar').disabled = true;
+            ocultarAlerta();
+
+            // Clean up secondary alerts
+            document.querySelectorAll('.alert-warning.mt-2').forEach(function (el) { el.remove(); });
+        }
+    </script>
+</body>
+</html>
