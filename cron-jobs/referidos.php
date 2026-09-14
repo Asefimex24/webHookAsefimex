@@ -1,19 +1,33 @@
 <?php
 
-//script que permite enviar mensajes del programa de de lealtad a los clientes
-set_time_limit(0);
-echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
+//script que permite enviar mensajes de marketin para compaña de referidos
 
-date_default_timezone_set("America/Mexico_City");
-
-//mostrar errores en tiempo de ejecucion
+//se agrega visualización de errores para cron-job
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+//liminte de ejecucion
+set_time_limit(0);
+
+//mostrar mensaje de inicio de proceso en cron-job
+echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
+
+date_default_timezone_set("America/Mexico_City");
+
 require_once __DIR__ . '/../getEnv.php';
 
 use Twilio\Rest\Client;
+
+//validar que las variables de entorno se carguen correctamente.
+if (empty($_ENV['HOST']) || empty($_ENV['TWILIO_ACCOUNT_SID'])) {
+    die("Error: Variables de entorno no cargadas en CLI.");
+}
+
+
+//mostrar variables de entorno cargadas
+//echo "Host: ".$_ENV['HOST']." dDb: ".$_ENV['DB']." usuario: ".$_ENV['USERDB']." TwSID: ".$_ENV['TWILIO_ACCOUNT_SID'] ;
+
 
 $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
 $pdo = new PDO($dsn, $_ENV['USERDB'], $_ENV['PASSWORD']);
@@ -24,7 +38,7 @@ $hoy = date('Y-m-d');
 
 $enviadosHoy = $pdo->query("SELECT COUNT(*) FROM promocion_referidos WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
-if ($enviadosHoy >= 4000) {
+if ($enviadosHoy >= 5000) {
     die('Límite diario de 4,000 mensajes alcanzado.');
 }
 
