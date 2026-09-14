@@ -1,7 +1,15 @@
 <?php
 
 //script que permite enviar mensajes del programa de de lealtad a los clientes
+
+//se agrega visualización de errores para el cronjob
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+//liminte de ejecucion
 set_time_limit(0);
+//mostrar mensaje de inicio de proceso en cron-job
 echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
 
 date_default_timezone_set("America/Mexico_City");
@@ -10,8 +18,17 @@ require_once __DIR__ . '/../getEnv.php';
 
 use Twilio\Rest\Client;
 
+//validar que las variables de entorno se carguen correctamente.
+if (empty($_ENV['HOST']) || empty($_ENV['TWILIO_ACCOUNT_SID'])) {
+    die("Error: Variables de entorno no cargadas en CLI.");
+}
+
+//mostrar variables de entorno cargadas
+//echo "Host: ".$_ENV['HOST']." dDb: ".$_ENV['DB']." usuario: ".$_ENV['USERDB']." TwSID: ".$_ENV['TWILIO_ACCOUNT_SID'] ;
+
+
 $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
-$pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
+$pdo = new PDO($dsn, $_ENV['USERDB'], $_ENV['PASSWORD']);
 $pdo->exec("SET time_zone = '-06:00'");
 
 // Verificar límite diario (opcional pero recomendado)
