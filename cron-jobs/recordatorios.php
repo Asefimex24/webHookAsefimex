@@ -21,6 +21,7 @@ require_once __DIR__ . '/../getEnv.php';
 
 use Twilio\Rest\Client;
 
+
 //validar que las variables de entorno se carguen correctamente.
 if (empty($_ENV['HOST']) || empty($_ENV['TWILIO_ACCOUNT_SID'])) {
     die("Error: Variables de entorno no cargadas en CLI.");
