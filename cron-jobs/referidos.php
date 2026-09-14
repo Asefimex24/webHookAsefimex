@@ -43,7 +43,7 @@ if ($enviadosHoy >= 5000) {
 }
 
 // Tomar los siguientes 800 mensajes pendientes
-$stmt = $pdo->query("SELECT * FROM promocion_referidos WHERE estado = 'pendiente' ORDER BY idRegistro ASC LIMIT 800");
+$stmt = $pdo->query("SELECT * FROM promocion_referidos WHERE estado = 'pendiente' ORDER BY idRegistro ASC LIMIT 1");
 $lote = $stmt->fetchAll();
 
 
@@ -78,9 +78,6 @@ if ($lote) {
                 // Marcar como enviado en la cola de mensajes
                 $update = $pdo->prepare("UPDATE promocion_referidos SET estado = 'enviado', enviado_en = NOW() WHERE idRegistro = ?");
                 $update->execute([$tarea['idRegistro']]);
-
-
-
                 
                 //componer el mensaje para guardar en la tabla de mensajes_whatsapp
                 $messageBody = '¡Hola! 👋
