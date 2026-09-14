@@ -16,7 +16,7 @@ require_once __DIR__ . '/../getEnv.php';
 use Twilio\Rest\Client;
 
 $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
-$pdo = new PDO($dsn, $_ENV['USER'], $_ENV['PASSWORD']);
+$pdo = new PDO($dsn, $_ENV['USERDB'], $_ENV['PASSWORD']);
 $pdo->exec("SET time_zone = '-06:00'");
 
 // Verificar límite diario (opcional pero recomendado)
