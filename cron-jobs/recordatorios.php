@@ -28,7 +28,7 @@ if (empty($_ENV['HOST']) || empty($_ENV['TWILIO_ACCOUNT_SID'])) {
 
 
 //mostrar variables de entorno cargadas
-echo "Host: ".$_ENV['HOST']." dDb: ".$_ENV['DB']." usuario: ".$_ENV['USERDB']." TwSID: ".$_ENV['TWILIO_ACCOUNT_SID'] ;
+//echo "Host: ".$_ENV['HOST']." dDb: ".$_ENV['DB']." usuario: ".$_ENV['USERDB']." TwSID: ".$_ENV['TWILIO_ACCOUNT_SID'] ;
 
 
 $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
