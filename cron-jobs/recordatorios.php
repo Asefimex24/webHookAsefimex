@@ -41,7 +41,7 @@ $hoy = date('Y-m-d');
 
 $enviadosHoy = $pdo->query("SELECT COUNT(*) FROM cola_mensajes WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
-if ($enviadosHoy >= 5000) {
+if ($enviadosHoy >= 10000) {
     die("Límite diario de 5,000 mensajes alcanzado.");
 }
 
