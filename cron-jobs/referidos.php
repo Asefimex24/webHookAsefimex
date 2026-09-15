@@ -43,7 +43,7 @@ if ($enviadosHoy >= 5000) {
 }
 
 // Tomar los siguientes 800 mensajes pendientes
-$stmt = $pdo->query("SELECT * FROM promocion_referidos WHERE estado = 'pendiente' ORDER BY idRegistro ASC LIMIT 1");
+$stmt = $pdo->query("SELECT * FROM promocion_referidos WHERE estado = 'pendiente' ORDER BY idRegistro ASC LIMIT 800");
 $lote = $stmt->fetchAll();
 
 
