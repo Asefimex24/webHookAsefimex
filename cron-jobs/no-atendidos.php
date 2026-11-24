@@ -52,7 +52,7 @@ if ($lote) {
 
     foreach ($lote as $tarea) {
 
-        $celularLimpio = preg_replace('/\D/', '', $tarea['celular']);
+        $celularLimpio = preg_replace('/\D/', '', $tarea['telefono']);
 
         // Validar que el número tenga exactamente 10 dígitos
         if (mb_strlen($celularLimpio) == 10) {
@@ -122,7 +122,7 @@ if ($lote) {
             }
         } else {
             // Marcar como fallido por número inválido
-            echo "Número inválido para el cliente ID " . $tarea['idRegistro'] . ": " . $tarea['celular'] . "\n";
+            echo "Número inválido para el cliente ID " . $tarea['idRegistro'] . ": " . $tarea['telefono'] . "\n";
             $update = $pdo->prepare("UPDATE no_atendidos SET estado = 'fallido', enviado_en = NOW(), observacion='Número inválido' WHERE idRegistro = ?");
             $update->execute([$tarea['idRegistro']]);
             continue;
