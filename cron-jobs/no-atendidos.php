@@ -114,9 +114,9 @@ if ($lote) {
                 $update->execute([$tarea['idRegistro']]);
 
                 // Guardar historial (ajustado a +52 para SMS; cambia el nombre de la tabla si creaste una nueva para SMS)
-                $sql = "INSERT INTO mensajes_whatsapp (remitente, mensaje, direccion) VALUES (?, ?, 'saliente')";
-                $stmtInsert = $pdo->prepare($sql);
-                $stmtInsert->execute(['+52' . $celularLimpio, $messageBody]);
+                // $sql = "INSERT INTO mensajes_whatsapp (remitente, mensaje, direccion) VALUES (?, ?, 'saliente')";
+                // $stmtInsert = $pdo->prepare($sql);
+                // $stmtInsert->execute(['+52' . $celularLimpio, $messageBody]);
             } catch (Exception $e) {
                 echo "Error al enviar SMS a " . $celularLimpio . ": " . $e->getMessage() . "\n";
                 $update = $pdo->prepare("UPDATE no_atendidos SET estado = 'fallido', observación='Error al enviar' WHERE idRegistro = ?");
