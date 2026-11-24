@@ -57,6 +57,8 @@ if ($lote) {
         // Validar que el número tenga exactamente 10 dígitos
         if (mb_strlen($celularLimpio) == 10) {
 
+            echo 'Telefono del prospecto: ' . $tarea['telefono'] . '<br>';
+
             try {
                 // Para SMS en México el formato internacional es 52 + 10 dígitos (sin el 1)
                 $destinatario = "52" . $celularLimpio;
