@@ -53,7 +53,7 @@ if ($lote) {
     $twilio = new Client($sid, $token);
 
     //contador para validar el envio de 30 mensajes y poner delay de 1 seg.
-    $contador=1;
+    $contador = 1;
 
     foreach ($lote as $tarea) {
 
@@ -78,7 +78,7 @@ if ($lote) {
 
 
 
-                
+
                 //componer el mensaje para guardar en la tabla de mensajes_whatsapp
                 $messageBody = '¡Beneficio Especia para tíl!
 Realiza tu pago del 27 al 30 de marzo de 2026 y participa:
@@ -112,10 +112,10 @@ No dejes pasar esta oportunidad, ponte al corriente y participa.
         }
 
 
-                
-        if($contador%30==0){        
+
+        if ($contador % 30 == 0) {
             // Pausa tras cada 30 mensajes    
-            sleep(1); 
+            sleep(1);
         }
 
         $contador++;

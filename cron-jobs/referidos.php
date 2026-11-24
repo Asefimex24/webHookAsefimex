@@ -56,7 +56,7 @@ if ($lote) {
     $twilio = new Client($sid, $token);
 
     //contador para validar el envio de 30 mensajes y poner delay de 1 seg.
-    $contador=1;
+    $contador = 1;
 
     foreach ($lote as $tarea) {
 
@@ -78,7 +78,7 @@ if ($lote) {
                 // Marcar como enviado en la cola de mensajes
                 $update = $pdo->prepare("UPDATE promocion_referidos SET estado = 'enviado', enviado_en = NOW() WHERE idRegistro = ?");
                 $update->execute([$tarea['idRegistro']]);
-                
+
                 //componer el mensaje para guardar en la tabla de mensajes_whatsapp
                 $messageBody = '¡Hola! 👋
                                 En Asefimex queremos premiar tu recomendación.
@@ -106,10 +106,10 @@ if ($lote) {
             $update->execute([$tarea['idRegistro']]);
             continue;
         }
-                
-        if($contador%30==0){        
+
+        if ($contador % 30 == 0) {
             // Pausa tras cada 30 mensajes    
-            sleep(1); 
+            sleep(1);
         }
 
         $contador++;
