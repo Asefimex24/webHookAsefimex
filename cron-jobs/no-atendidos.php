@@ -62,10 +62,11 @@ if ($lote) {
             try {
                 // Para SMS en México el formato internacional es 52 + 10 dígitos (sin el 1)
                 $destinatario = "52" . $celularLimpio;
+                $nombre = str_replace('Ã‘', 'Ñ', $tarea['nombreProspecto']);
 
                 // Payload para la API JSON de LabsMobile
                 $payload = [
-                    "message" => 'Estimado ' . $tarea['nombreProspecto'] . ', cuentas con una solicitud de crédito en trámite con Asefimex. ¿Deseas continuar? da click en el siguiente enlace para confirmar: https://api.whatsapp.com/send?phone=529612550377&text=retomar+tramite',
+                    "message" => 'Estimado ' . $nombre . ', cuentas con una solicitud de crédito en trámite con Asefimex. ¿Deseas continuar? da click en el siguiente enlace para confirmar: https://api.whatsapp.com/send?phone=529612550377&text=retomar+tramite',
                     "tpoa"    => "Sender", // Remitente (en México suele sobreescribirse por número corto local)
                     "ucs2"    => 0,        // 0 = GSM estándar (160 chars), 1 = Unicode con acentos/emojis (70 chars)
                     "recipient" => [
@@ -119,7 +120,7 @@ if ($lote) {
                 // $stmtInsert->execute(['+52' . $celularLimpio, $messageBody]);
             } catch (Exception $e) {
                 echo "Error al enviar SMS a " . $celularLimpio . ": " . $e->getMessage() . "\n";
-                $update = $pdo->prepare("UPDATE no_atendidos SET estado = 'fallido', observación='Error al enviar' WHERE idRegistro = ?");
+                $update = $pdo->prepare("UPDATE no_atendidos SET estado = 'fallido', observacion='Error al enviar' WHERE idRegistro = ?");
                 $update->execute([$tarea['idRegistro']]);
             }
         } else {
