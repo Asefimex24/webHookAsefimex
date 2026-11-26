@@ -112,7 +112,7 @@ if ($lote) {
 
 
 
-        if ($contador % 30 == 0) {
+        if ($contador % 50 == 0) {
             // Pausa tras cada 30 mensajes    
             sleep(1);
         }
