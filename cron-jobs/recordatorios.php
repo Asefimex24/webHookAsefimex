@@ -58,7 +58,7 @@ if ($lote) {
     $twilio = new Client($sid, $token);
 
     //contador para validar el envio de 30 mensajes y poner delay de 1 seg.
-    $contador=1;
+    $contador = 1;
 
     foreach ($lote as $tarea) {
 
@@ -96,7 +96,6 @@ if ($lote) {
                 $sql = "INSERT INTO mensajes_whatsapp (remitente, mensaje, direccion) VALUES (?, ?, 'saliente')";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute(['+521' . $tarea['telefono'], $messageBody]);
-                
             } catch (Exception $e) {
                 // En caso de error, marcar como fallido
                 $update = $pdo->prepare("UPDATE cola_mensajes SET estado = 'fallido' WHERE id = ?");
@@ -110,14 +109,13 @@ if ($lote) {
         }
 
 
-        
-        if($contador%30==0){        
+
+        if ($contador % 30 == 0) {
             // Pausa tras cada 30 mensajes    
-            sleep(1); 
+            sleep(1);
         }
 
         $contador++;
-
     }
     echo "Lote de " . count($lote) . " mensajes procesado.";
 } else {
