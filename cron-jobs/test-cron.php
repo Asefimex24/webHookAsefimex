@@ -21,7 +21,7 @@ for ($contador = 1; $contador <= 400; $contador++) {
     $update->execute();
     if ($contador % 10 == 0) {
         // Pausa tras cada mensaje  
-        echo 'Pausa de mensaje cronjob # '.$contador;  
+        echo 'Pausa de mensaje cronjob # ' . $contador;
         sleep(1);
     }
 }

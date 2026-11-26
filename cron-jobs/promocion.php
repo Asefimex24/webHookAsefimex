@@ -1,5 +1,8 @@
 <?php
 
+
+date_default_timezone_set("America/Mexico_City");
+
 //se agrega visualización de errores para el cronjob
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -10,20 +13,28 @@ set_time_limit(0);
 //mostrar mensaje de inicio de proceso en cron-job
 echo 'proceso ejecutado el: ' . date('Y-m-d H:i:s') . "\n";
 
-date_default_timezone_set("America/Mexico_City");
 
 require_once __DIR__ . '/../getEnv.php';
 
 use Twilio\Rest\Client;
 
 //validar que las variables de entorno se carguen correctamente.
-if (empty($_ENV['HOST']) || empty($_ENV['TWILIO_ACCOUNT_SID'])) {
-    die("Error: Variables de entorno no cargadas en CLI.");
+$variablesRequeridas = [
+    'HOST',
+    'DB',
+    'USERDB',
+    'TWILIO_ACCOUNT_SID',
+    'TWILIO_AUTH_TOKEN',
+    'TWILIO_WHATSAPP_NUMBER',
+    'SID_TEMP_PROMOCION',
+    'CONTENT_BODY_PROMOCION',
+];
+
+foreach ($variablesRequeridas as $variable) {
+    if (empty($_ENV[$variable])) {
+        die("Error: la variable de entorno '$variable' no está definida o está vacía.\n");
+    }
 }
-
-
-//mostrar variables de entorno cargadas
-//echo "Host: ".$_ENV['HOST']." dDb: ".$_ENV['DB']." usuario: ".$_ENV['USERDB']." TwSID: ".$_ENV['TWILIO_ACCOUNT_SID'] ;
 
 
 $dsn = "mysql:host=" . $_ENV['HOST'] . ";dbname=" . $_ENV['DB'] . ";charset=utf8mb4";
@@ -36,13 +47,12 @@ $hoy = date('Y-m-d');
 $enviadosHoy = $pdo->query("SELECT COUNT(*) FROM promocion WHERE estado='enviado' AND DATE(enviado_en) = '$hoy'")->fetchColumn();
 
 if ($enviadosHoy >= 10000) {
-    die("Límite diario de 4,000 mensajes alcanzado.");
+    die("Límite diario de 10,000 mensajes alcanzado.");
 }
 
 // Tomar los siguientes 800 mensajes pendientes
 $stmt = $pdo->query("SELECT * FROM promocion WHERE estado = 'pendiente' ORDER BY idRegistro ASC LIMIT 800");
 $lote = $stmt->fetchAll();
-
 
 
 if ($lote) {
@@ -66,8 +76,8 @@ if ($lote) {
                 $twilio->messages->create(
                     "whatsapp:+521" . $tarea['celular'], // Destinatario
                     [
-                        "from" => "whatsapp:+5219612049936", // Tu número de Twilio
-                        "contentSid" => "HX00862e317c53ece6070b4f0e822b09f1", // Tu SID de plantilla de contenido
+                        "from" => "whatsapp:" . $_ENV['TWILIO_WHATSAPP_NUMBER'], // Tu número de Twilio
+                        "contentSid" => $_ENV['SID_TEMP_PROMOCION'], // Tu SID de plantilla de contenido
                     ]
                 );
 
@@ -76,19 +86,8 @@ if ($lote) {
                 $update = $pdo->prepare("UPDATE promocion SET estado = 'enviado', enviado_en = NOW() WHERE idRegistro = ?");
                 $update->execute([$tarea['idRegistro']]);
 
-
-
-
                 //componer el mensaje para guardar en la tabla de mensajes_whatsapp
-                $messageBody = '¡Beneficio Especia para tíl!
-Realiza tu pago del 27 al 30 de marzo de 2026 y participa:
-
-Sorteo de $12,000 que será abonado directamente a tu crédito.
-Fecha del sorteo 10 de Abril 2026.
-
-Es tu oportunidad de avanzar más rápido, reducir tu saldo y seguir creciendo con nosotros. 
-No dejes pasar esta oportunidad, ponte al corriente y participa.
-¡Haz tu pago dentro de las fechas y asegura tu lugar en el sorteo!';
+                $messageBody = $_ENV['CONTENT_BODY_PROMOCION'];
 
 
                 //guardar en tabla de mensajes_whatsapp para poder ver el historial de mensajes que responden los clientes.
