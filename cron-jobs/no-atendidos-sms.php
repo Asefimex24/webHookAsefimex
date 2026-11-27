@@ -66,7 +66,7 @@ if ($lote) {
 
                 // Payload para la API JSON de LabsMobile
                 $payload = [
-                    "message" => 'Estimado ' . $nombre . ', cuentas con una solicitud de crédito en trámite con Asefimex. ¿Deseas continuar? da click en el siguiente enlace para confirmar: https://api.whatsapp.com/send?phone=529612550377&text=retomar+tramite',
+                    "message" => 'Estimado ' . $nombre . ', cuentas con una solicitud de crédito en trámite con Asefimex. ¿Deseas continuar tu solicitud? da click en el siguiente enlace para confirmar: https://asefimex.com/no-atendidos/' . $celularLimpio . '/sms',
                     "tpoa"    => "Sender", // Remitente (en México suele sobreescribirse por número corto local)
                     "ucs2"    => 0,        // 0 = GSM estándar (160 chars), 1 = Unicode con acentos/emojis (70 chars)
                     "recipient" => [

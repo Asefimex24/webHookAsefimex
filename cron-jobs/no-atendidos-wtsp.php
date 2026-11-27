@@ -60,7 +60,7 @@ if ($lote) {
         // Validar que el número tenga exactamente 10 dígitos
         if (mb_strlen($celularLimpio) == 10) {
 
-            echo 'Telefono del prospecto: ' . $tarea['telefono'] . '<br>';
+
 
             try {
                 // Para WhatsApp en México el formato internacional es whatsapp:+521 + 10 dígitos
@@ -74,7 +74,8 @@ if ($lote) {
                         "from" => "whatsapp:+5219612049936",
                         "contentSid" => $contentSid,
                         "contentVariables" => json_encode([
-                            "1" => $nombre // Corresponde a {{1}} en tu plantilla de Twilio
+                            "1" => $nombre, // Corresponde a {{1}} en tu plantilla de Twilio
+                            "2" => $tarea['telefono'], //se envia el numero de telefono como parametro para consulta en la validacion
                         ])
                     ]
                 );
@@ -83,12 +84,12 @@ if ($lote) {
                 $update = $pdo->prepare("UPDATE no_atendidos SET estado = 'enviado', enviado_en = NOW() WHERE idRegistro = ?");
                 $update->execute([$tarea['idRegistro']]);
 
-                // Guardar historial (descomentar si deseas registrar en mensajes_whatsapp)
-                // $messageBody = 'Estimado ' . $nombre . ', cuentas con una solicitud de crédito en trámite con Asefimex. ¿Deseas continuar? da click en el siguiente enlace para confirmar: https://api.whatsapp.com/send?phone=529612550377&text=retomar+tramite';
-                // $sql = "INSERT INTO mensajes_whatsapp (remitente, mensaje, direccion) VALUES (?, ?, 'saliente')";
-                // $stmtInsert = $pdo->prepare($sql);
-                // $stmtInsert->execute(['+521' . $celularLimpio, $messageBody]);
+                //Guardar historial (descomentar si deseas registrar en mensajes_whatsapp), se obtiene
+                $messageBody = $_ENV['CONTENT_BODY_NO_ATENDIDOS'];
 
+                $sql = "INSERT INTO mensajes_whatsapp (remitente, mensaje, direccion) VALUES (?, ?, 'saliente')";
+                $stmtInsert = $pdo->prepare($sql);
+                $stmtInsert->execute(['+521' . $celularLimpio, $messageBody]);
             } catch (Exception $e) {
                 echo "Error al enviar WhatsApp a " . $celularLimpio . ": " . $e->getMessage() . "\n";
                 $update = $pdo->prepare("UPDATE no_atendidos SET estado = 'fallido', observacion='Error al enviar' WHERE idRegistro = ?");

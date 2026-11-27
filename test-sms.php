@@ -15,7 +15,7 @@ $destinatario = "529615792121";
 
 // Payload para la API JSON de LabsMobile   <a href="https://www.ejemplo.com">este enlace</a>.
 $payload = [
-    "message" => 'Estimado ' . 'EVER LOPEZ MARTINEZ' . ', cuentas con una solicitud de crédito en trámite con Asefimex. ¿Deseas continuar? da click en el siguiente enlace para confirmar: https://api.whatsapp.com/send?phone=529612550377&text=retomar+tramite',
+    "message" => 'Estimado ' . 'EVER LOPEZ MARTINEZ' . ', cuentas con una solicitud de crédito en trámite con Asefimex. ¿Deseas continuar tu solicitud? da click en el siguiente enlace para confirmar: http://192.168.70.37/no-atendidos/9615792121/sms',
     "tpoa"    => "Sender", // Remitente (en México suele sobreescribirse por número corto local)
     "ucs2"    => 0,        // 0 = GSM estándar (160 chars), 1 = Unicode con acentos/emojis (70 chars)
     "recipient" => [
